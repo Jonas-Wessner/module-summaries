@@ -1,0 +1,2 @@
+$ sudo apt install thrift-compiler
+$ thrift -gen cpp example.thrift

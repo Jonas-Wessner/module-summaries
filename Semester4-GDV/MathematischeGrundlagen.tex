@@ -1,0 +1,189 @@
+\newpage
+
+\section{Mathematische Grundlagen}
+
+Die Transformationen, die wir genauer betrachten wollen sind die Translation (Verschiebung), die Transformation (Größenänderung) und die Rotation (Drehung). Diese Transformationen nennt man auch affine Abbildungen. Das bedeutet, dass:
+\begin{enumerate}
+    \item Die Bildpunkte von Punkten, die auf einer Gerade liegen, liegen wieder auf einer Geraden.
+    \item Die Bilder von parallelen Geraden sind wieder Parallel.
+    \item Die Größenverhältnisse der Bildpunkte stimmen mit denen der ursprünglichen Punkte überein.
+\end{enumerate}
+
+Wir wollen uns nun ansehen, wie diese Transformationen mathematisch umgesetzt werden.
+
+\subsection{Skalierung}
+Die Skalierung eines Vektors $\vec{x}$ wird beschrieben durch die Multiplikation mit einem Skalar y:
+
+\[
+    \begin{pmatrix}
+        x_{1} \\
+        x_{2} \\
+        x_{3}
+    \end{pmatrix}
+    \cdot
+    y
+\]
+
+
+Auf diese Weise wird jede Komponente von $\vec{x}$ mit dem gleichen Wert y multipliziert. Um mehr Flexibilität zu erlangen und Objekte auch in verschiedene Achsenrichtungen unterschiedlich skalieren zu können, können wir die Skalierung auch als Matrix $Y$ definieren. Diese Methode wird auch von OpenGL verwendet. Wenn wir eine Transformation definieren wird die aktuelle Matrix $A$ mit einer Transformationsmatrix $X$ multipliziert. Diese werden dann mit den Ortsvektoren $\vec{x_{i}}$ aller Punkte der Objekte multipliziert.
+
+\[
+    A
+    \cdot
+    \begin{pmatrix}
+        y_{1} & 0     & 0     \\
+        0     & y_{2} & 0     \\
+        0     & 0     & 0_{3} \\
+    \end{pmatrix}
+    \cdot
+    \begin{pmatrix}
+        x_{1} \\
+        x_{2} \\
+        x_{3}
+    \end{pmatrix}
+\]
+
+
+\subsection{Rotation}
+
+Die Rotation/Drehung wird ebenfalls durch die Multiplikation mit einer Matrix beschrieben. Die Komponente der Vektoren, mit denen die Matrix multipliziert wird, um die sich gedreht wird, darf nicht verändert werden. muss der Zeilenvektor, an dieser Stelle die Komponenten haben, die die Einheitsmatrix an dieser Stelle hätte.
+
+Rotation um $\alpha$ gegen den Uhrzeigersinn um die x Achse:
+
+\[
+    A(\alpha)
+    \cdot
+    \begin{pmatrix}
+        1 & 0          & 0           \\
+        0 & \cos\alpha & -\sin\alpha \\
+        0 & \sin\alpha & \cos\alpha  \\
+    \end{pmatrix}
+\]
+
+Rotation um $\alpha$ gegen den Uhrzeigersinn um  die y-Achse:
+
+\[
+    A(\alpha)
+    \cdot
+    \begin{pmatrix}
+        \cos\alpha & 0 & -\sin\alpha \\
+        0          & 1 & 0           \\
+        \sin\alpha & 0 & \cos\alpha  \\
+    \end{pmatrix}
+\]
+
+Rotation um $\alpha$ gegen den Uhrzeigersinn um  die z-Achse:
+
+\[
+    A(\alpha)
+    \cdot
+    \begin{pmatrix}
+        \cos\alpha & -\sin\alpha & 0 \\
+        \sin\alpha & \cos\alpha  & 0 \\
+        0          & 0           & 1 \\
+    \end{pmatrix}
+\]
+
+\subsection{Translation}
+
+Die Translation ist auf den ersten Blick eine Vektoraddition eines Ortsvektors $\vec{v}$ mit einem Translationsvektors $\vec{t}$:
+
+\begin{equation}
+    \vec{x}
+    +
+    \vec{t}
+    =
+    \begin{pmatrix}
+        v_{1} \\
+        v_{2} \\
+        v_{3}
+    \end{pmatrix}
+    +
+    \begin{pmatrix}
+        t_{1} \\
+        t_{2} \\
+        t_{3}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        v_{1} + t_{1} \\
+        v_{2} + t_{2} \\
+        v_{3} + t_{3}
+    \end{pmatrix}
+\end{equation}
+
+Während diese Herangehensweise für das Rechnen mit der Hand gut funktioniert, haben wir bei der maschinellen Berechnung ein Design-Problem. Denn die anderen beiden Transformationen, Skalierung und Rotation, können wir als Multiplikationen mit einer Matrix darstellen. OpenGL kann also alle Transformationsmatrizen multiplizieren und somit eine akkumulierte Matrix berechnen, die dann auf alle Punkte der Objekte angewandt wird. Wenn wir die Translation als addition mit einem Translationsvektor $\vec{y}$ beschreiben, müsste OpenGL zusätzlich zur akkumulierten Matrix auch noch einen akkumulierten Translationsvektor speichern, auf den alle Transformationen aufaddiert werden. Damit OpenGL trotzdem bloß mit Matrixmultiplikation rechnen kann, werden Homogene Koordinaten verwendet.\\
+Homogene Koordinaten beschreiben das Erweitern der Vektoren und Matrizen eines bestimmten Vektorraums (hier der 3-dimensionale Vektorraum), um die Koordinaten einer weiteren Dimension. Dabei erweitern vir alle Vektoren $\vec{v}$ um eine Koordinate $v_{4}=1$. Alle Matrizen $M$ werden mit den Koordinaten der 4-dimensionalen Einheitsmatrix erweitert. Dabei können aber Koordinaten $M_{14}, M_{24}, M_{34}$ durch die Komponenten des Translationsvektors $\vec{t}$ aus (1) ersetzt werden.
+
+\begin{equation}
+    \vec{v}
+    =
+    \begin{pmatrix}
+        v_{1} \\
+        v_{2} \\
+        v_{3}
+    \end{pmatrix}
+    \rightarrow
+    \vec{v'}
+    =
+    \begin{pmatrix}
+        v_{1} \\
+        v_{2} \\
+        v_{3} \\
+        1
+    \end{pmatrix}
+\end{equation}
+
+\[
+    M
+    =
+    \begin{pmatrix}
+        M_{11} & M_{12} & M_{13} \\
+        M_{21} & M_{22} & M_{23} \\
+        M_{31} & M_{32} & M_{33} \\
+    \end{pmatrix}
+    \rightarrow
+    M'
+    =
+    \begin{pmatrix}
+        M_{11} & M_{12} & M_{13} & t_{1} \\
+        M_{21} & M_{22} & M_{23} & t_{3} \\
+        M_{31} & M_{32} & M_{33} & t_{3} \\
+        0      & 0      & 0      & 1
+    \end{pmatrix}
+\]
+
+Mithilfe dieser Erweiterung können wir nun auch die Translation als Matrixmultiplikation darstellen. Denn bei der Multiplikation der Matrix $M'$ mit dem Vektor $\vec{v'}$ entsteht ein Vektor $\vec{v'_{M'}}$, der identisch zu dem Vektor $\vec{v_{Mt}}$ ist, der entsteht, wenn man zunächst die Multiplikation mit $M$ und dann die Addition mit $\vec{t}$ durchgeführt hätte und ihn um eine homogene Koordinate erweitert.
+
+\begin{equation}
+    M
+    \cdot
+    \vec{v}
+    +
+    \vec{t}
+    \rightarrow
+    M'
+    \cdot
+    \vec{v'}
+    =
+    \begin{pmatrix}
+        M_{11} & M_{12} & M_{13} & t_{1} \\
+        M_{21} & M_{22} & M_{23} & t_{3} \\
+        M_{31} & M_{32} & M_{33} & t_{3} \\
+        0      & 0      & 0      & 1
+    \end{pmatrix}
+    \cdot
+    \begin{pmatrix}
+        v_{1} \\
+        v_{2} \\
+        v_{3} \\
+        1
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        v_{1} \cdot M_{11} + v_{2} \cdot M_{12} + v_{3} \cdot M_{13} + \boldsymbol{t_{1}} \\
+        v_{1} \cdot M_{21} + v_{2} \cdot M_{22} + v_{3} \cdot M_{23} + \boldsymbol{t_{2}} \\
+        v_{1} \cdot M_{31} + v_{2} \cdot M_{32} + v_{3} \cdot M_{33} + \boldsymbol{t_{3}} \\
+        1
+    \end{pmatrix}
+\end{equation}

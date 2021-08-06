@@ -1,0 +1,211 @@
+\section{Performance Optimierung beim OR-Mapping}
+
+\subsection{Transaktionsmanagement}
+\subsubsection{Funktionsweise von Sessions und Transactions}
+
+Wenn wir mit JPA arbeiten, gilt im Bezug auf Sessions und Transaktions das Folgende:
+
+\begin{itemize}
+    \item Der Lebenszyklus einer Instanz der EntityManager-Class ist Äquivalent zu einer DB-Session. In dieser kann es mehrere Transactions geben.
+    \item Die Dauer zwischen den Aufrufen von Transaction.begin() und Transaction.commit() ist die Dauer einer Transaction. Änderungen werden erst beim Aufruf von Transaction.commit() in die DB geschrieben. Damit ist gewährleistet, dass alle Operationen einer Transaction ausgeführt werden oder garkeine.
+\end{itemize}
+
+Auf \textbf{Datenbankebene} wird beim Aufteten eines Fehlers eine uncommitted Transaction zurückgerollt (rollback).\\
+Tritt auf \textbf{Anwendungsebene} allerdings eine Exception auf, so kann das DBMS nichts davon mitbekommen. In diesen Fällen sollte die Transaction explizit zurückgerollt werden. Das kann dann ungefähr so aussehen:
+
+\begin{lstlisting}
+    EntityManager em = emf.createEntityManager(); // start session
+    EntityTransaction t;
+    try{
+        t = em.getTransaction();
+        t.begin();
+
+        // (...)
+
+        t.commit();
+    } catch(RuntimeException e){
+        if(t != null && t.isActive()){
+            t.rollback();
+        }
+        throw e; // optionally rethrow exception to handle by caller
+    } finally {
+        em.close(); // close session
+    }
+\end{lstlisting}
+
+\subsubsection{Best Practices für Transactionsmanagement}
+Dem Entwickler ist freigestellt wie er Transactions und Sessions einsetzen möchte. Es ergeben sich folgende Möglichkeiten mit ihren Vor- und Nachteilen:
+
+\begin{enumerate}
+    \item \textbf{Session per Request-Pattern:} Jede Transaction in einer eigenen Session durchführen, d.h. immer eine neue Instanz der EntityManager-Class benutzen.\\
+          \textbf{Vorteile:}
+          \begin{itemize}
+              \item Beim Start jeder Transaction ist der Persistenzkontext frisch und konsistent mit dem Zustand der DB
+          \end{itemize}
+          \textbf{Nachteile:}
+          \begin{itemize}
+              \item Beim schließen des EntityManager-Objekts gehen alle Java-Objekte, die sich im Persistenzkontext befinden, vom Zustand persisted in den Zustand detached über. Soll mit diesen Objekten in einer weiteren Transaktion (und also auch weiteren Session) weitergearbeitet werden, so müssen sie dem Persistenzkontext des neuen EntityManager-Objekts wieder explizit zugefügt werden. Dies geschieht über den Aufruf von merge()
+              \item Erzeugen vieler einzelner Sessions ist weniger performant (erst bei vielen Sessions ausschlaggebend)
+          \end{itemize}
+    \item \textbf{Transaction per Request:} Jede Transaction in der gleichen Session durchführen, dh. alle Transactions über das selbe EntityManager-Objekt abschließen.\\
+          \textbf{Vorteile:}
+          \begin{itemize}
+              \item Java-Objekte, die im Persistenzkontext des EntityManager-Objekts sind, können über mehrere Transactions weiter verwendet werden.
+          \end{itemize}
+          \textbf{Nachteile:}
+          \begin{itemize}
+              \item Mit zunehmender Zeit, die eine Session aktiv ist steigt die Chance, dass Java-Objekte, die im Persistenzkontext sind, von anderen konkurrierenden DB-Zugriffen manipuliert wurden und sich also auf DB-Ebene verändert haben. Es empfiehlt sich eine explizite Synchronisation mit EntityManager.refresh() durchzuführen.
+          \end{itemize}
+    \item Ein \textbf{Mittelweg} der beiden oberen Herangehensweisen.
+\end{enumerate}
+
+Wir sehen also, dass die Länge der Sessions, vor allem auch mit Bezug auf die Wahrscheinlichkeit von konkurrierenden Zugriffen, abgewägt werden muss.
+
+\subsection{Caching}
+
+\subsubsection{First-Level-Cache}
+Der First-Level-Cache ist immer aktiv und an ein Entity-Manager-Objekt gebunden. Er gilt also für genau eine DB-Session. Die Aufgabe des First-Level-Cache ist es die Anzahl der SQL-Statements, die an die DB gesendet werden zu minimieren. Beispielsweise werden mehrere UPDATEs auf dem selben Objekt innerhalb einer Transaction zu einem einzigen UPDATE Statement zusammengefasst, welches zum Zeitpunkt des Commits übertragen wird. Ebenso werden Objekte, die bereits von der DB in den Persistenzkontext geladen wurden vom First-Level-Cache gespeichert und bei einer erneuten Anfrage zurückgegeben anstatt sie mit einer weiteren Query erneut zu laden.
+
+\subsubsection{Second-Level-Cache}
+Der Second-Level-Cache ist ein Cache, der an eine EntityManagerFactory und damit an eine DB-Connection gebunden ist. Er muss vom Entwickler explizit in der Persistence-Unit des Projekts aktiviert werden:
+\begin{lstlisting}
+    <property name="javax.persistence.sharedCache.mode" value="XXX" />
+\end{lstlisting}
+
+Mögliche Werte für diese Property sind:
+\begin{itemize}
+    \item ALL
+    \item NONE
+    \item ENABLE\_SELECTIVE
+    \item DISABLE\_SELECTIVE
+\end{itemize}
+
+Im Second-Level-Cache werden die Ergebnisse von Queries sessionübergreifend gespeichert. Bei der Abfrage von Daten wird zuerst der First- dann der Second-Level-Cache und erst dann die DB durchsucht, um die Daten zu finden.
+
+\subsection{Ladestrategien}
+
+\subsubsection{Eager Loading vs. Lazy Loading}
+
+Nehmen wir nun zur Veranschaulichung an, dass wir zwei Java-Klassen haben, Car und Engine:
+
+\begin{lstlisting}
+@Entity
+public class Car {
+    public String licensePlate;
+    private Engine engine;
+    // (...)
+}
+@Entity
+public class Engine {
+    // (...)
+}
+\end{lstlisting}
+
+Wenn wir nun ein Car-Objekt mit JPQL aus der DB abfragen, müssen wir uns bewusst sein, dass dadurch ein impliziter Join benötigt wird. Car und Engine liegen also in unterschiedlichen DB-Tabellen und müssen gejoint werden, damit ein vollständiges Objekt der Klasse Car zurückgegeben werden kann. Wenn Engine jetzt wiederum Datenelemente einer anderen Entity hätte (Komposition), dann würde sich diese Kette fortsetzen und wir müssten auf DB-Ebene weitere Joins durchführen. Um auf dieses Verhalten Einfluss zu nehmen gibt es 2 Herangehensweisen zwischen denen sich entschieden werden kann:\\
+
+\textbf{Eager Loading:}\\
+Mit Eager Loading bezeichnen wir eine Ladestrategie, bei der wir angeforderte Objekte einmalig und vollständig von der DB laden. Das bedeutet, dass wir im Auto-Beispiel auch das Objekt der Engine-Klasse laden, wenn wir das Auto laden. Bei sehr verschachtelten Strukturen oder Kompositionen von Collections kann diese Herangehensweise dazu führen, dass sehr viele Daten geladen werden. Falls dann in Wirklichkeit gar nicht alle Informationen benötigt werden (im Beispiel etwa nur die licensePlate und nicht die Engine ausgelesen wird), dann haben wir großen unnötigen Mehraufwand gehabt, der uns Performance kostet. Falls tatsächlich alle Daten des Objektes benötigt werden, muss dagegen nichts mehr nachgeladen werden und alles liegt schon bei dem Ergebnis einer einzigen (wenn auch JOIN-behafteten) Query vor.
+
+\textbf{Lazy Loading:}\\
+Mit Lazy Loading bezeichnen wir eine Ladestrategie, bei der wir Attribute, die vom Typ anderer Entity-Klassen sind, nicht mitladen, sondern nur sogenannte Proxy-Objekte laden. Sobald auf ein Proxy-Objekt zugegriffen wird, führt JPA dann im Hintergrund eine Query aus, die das tatsächliche Objekt nachlädt.\\
+Im Auto-Beispiel würde also beim Abfragen eines Autos nur ein Proxy-Objekt der Engine geladen werden. Falls dann auf die Referenz zugegriffen wird, lädt JPA dynamisch die Daten für das tatsächliche Engine-Objekt. Auf diese Weise kann man sich eine große Menge der Datenübertragung sparen, falls tatsächlich nie auf das Attribut zugegriffen werden sollte. Falls jedoch doch auf das Attribut zugegriffen wird, hat man Performance verloren, weil man zwei separate Queries an das DBMS senden musste.\\
+In diesem Zusammenhang ist der Begriff \textbf{n+1-Problem} wichtig. Das n+1-Problem besagt, dass wir im Falle von Lazy Loading im schlechtesten Fall n+1 Datenbankzugriffe haben, wobei n die Anzahl der lazy geladenen Attribute ist. Wir benötigen nämlich n Zugriffe für die n Attribute und noch einen Zugriff zu Beginn für das Objekt der umschließenden Klasse.\\
+
+Wir sehen also, dass Eager Loading geschickter ist, wenn man bereits im Vorhinein weiß, dass man ein Attribut tatsächlich benutzen wird. Andersherum ist Lazy Loading geschickter wenn man ein Attribut eher nicht oder auf jeden Fall nicht benutzen wird.
+
+\subsubsection{Syntax von Eager- und Lazy-Loading in JPA}
+
+Um die Loading Strategy für ein Attribut festzulegen, annotieren wir dieses Attribut wie folgt mit FetchType.LAZY oder FetchType.EAGER:
+
+\begin{lstlisting}
+    @OneToMany(fetch = FetchType.XXX)
+    @ManyToOne(fetch = FetchType.XXX)
+    @ManyToMany(fetch = FetchType.XXX)
+    @Basic(fetch = FetchType.XXX) // for 1-1 compositions
+\end{lstlisting}
+
+Die Default Werte sind wie folgt:
+
+\begin{itemize}
+    \item \textbf{XxxToMany:} LAZY
+    \item \textbf{XxxToOne} und \textbf{Basic:} EAGER
+\end{itemize}
+
+Falls ein Attribut mit LAZY annotiert ist, aber in einer bestimmten Query doch mit der Strategie EAGER geladen werden soll, kann in der Query der sogenannte FETCH JOIN benutzt werden:
+
+\begin{lstlisting}
+    SELECT c from Customer c JOIN FETCH c.articles
+\end{lstlisting}
+
+In der oberen Query wird mittels JOIN FETCH erzwungen, dass das Attribut articles der Klasse Customer direkt mitgeladen wird, so als ob das Attribut mit fetch = FetchType.EAGER annotiert wäre.
+
+\subsection{Lesen großer Datenmengen}
+
+Paging und Scrolling sind Methoden, die genutzt werden können, um mit Anfragen zu arbeiten, die potentiell sehr große Datenmengen zurückgeben.
+
+\subsubsection{Paging}
+Paging bezeichnet das Verfahren bei dem nur eine Teilmenge der Ergebnismenge der Query zurückgegeben wird. Dabei gibt man den Startindex und die Anzahl der Zeilen an. Paging ist also sinnvoll, um die Datenmenge zu begrenzen. Paging ist allerdings nicht sinnvoll, wenn man eine große Datenmenge stückweise verarbeiten möchte. Dann müsste man sich nämlich den Index merken bis zu dem man in der vorherigen Iteration gelesen hat und außerdem sicherstellen, dass sich die Indices der einzelnen Zeilen zwischen Queries nicht verändern. Für solche Szenarien ist dann \hyperref[sec:scrolling]{Scrolling} besser geeignet.\\
+In JPA wird Paging benutzt, indem man die folgenden Instanzmethoden der Klasse Query benutzt:
+
+\begin{lstlisting}
+    Query.setFirstResult(int);
+    Query.setMaxResults(int);
+\end{lstlisting}
+
+Paging wird auch auf DB-Ebene unterstützt, sieht syntaktisch jedoch je nach SQL-Dialekt unterschiedlich aus. Deshalb ist es vorteilhaft, dass JPA die Übersetzung in den SQL-Dialekt des konkreten genutzten DBMS übernimmt.
+
+\subsubsection{Scrolling}
+\label{sec:scrolling}
+
+Scrolling bezeichnet ein Verfahren bei dem eine Art Iterator benutzt wird, um über eine Ergebnisrelation zu iterieren. Scrolling wird nicht im JPA-Standard, wohl aber von JDBC und Hibernate unterstützt.\\
+In \textbf{JDBC} geschiet dies über den Aufruf von der Methode next() auf dem ResultSet-Objekt:
+\begin{lstlisting}
+    Statement stmt = con.createStatement();
+    ResultSet rs = stmt.executeQuery("Select * from MyPlayers");
+    while(rs.next()){
+         // (...)
+    }
+\end{lstlisting}
+
+\subsection{Manipulieren großer Datenmengen}
+
+\subsubsection{Bulk-Operationen}
+\label{sec:bulk-operations}
+Als Bulk-Operationen bezeichnet man Statements, die mehrere Zeilen beeinflussen. Der Vorteil von Bulk-Operationen im Vergleich zu einzelnen Statements ist, dass nur ein Statement an das DBMS gesendet werden muss, die Datenübertragung also sehr gering ist.\\
+In \textbf{SQL} kennen wir diesbezüglich das UPDATE und das DELETE Statement. Diese Statements beeinflussen alle Zeilen der Tabelle. Es können aber auch bestimmte Zeilen mit einem WHERE herausgefiltert werden.\\
+Auch in \textbf{JPA} gibt es diese Operationen.
+
+\begin{lstlisting}[language=SQL]
+    UPDATE ClassName c
+    SET c.attribute = newValue
+    WHERE c.attribute = oldValue;
+
+    DELETE ClassName c
+    WHERE c.attribute = value;
+\end{lstlisting}
+
+Der Unterschied zu SQL ist hier aber, dass wir nicht mit Tabellen, sondern mit Klassen arbeiten. Das bedeutet, dass auch Vererbungshierarchien und Kompositionen beachtet werden.
+
+\subsubsection{Batch-Operationen}
+Als Batch-Operationen bezeichnet man das Senden von mehreren Statements an das DBMS in einem "`Rutsch''. Das ist sinnvoll, wenn viele Zeilen verändert werden sollen, aber die Logik zu komplex ist, um die Änderung mit einer einzigen \hyperref[sec:bulk-operations]{Bulk-Operation} durchzuführen.\\
+Batch-Operationen werden von \textbf{JDBC} seit Version 2.0 unterstützt. Dafür werden die Instanzmethoden der Statement-Class genutzt, um einzelne Batches einem Statement hinzuzufügen:
+
+\begin{lstlisting}
+Statement stmt = conn.createStatement();
+conn.setAutoCommit(false);
+
+stmt.addBatch("INSERT INTO ...");
+stmt.addBatch("DELETE FROM ...");
+stmt.addBatch("UPDATE ...");
+
+int[] count = stmt.executeBatch();
+
+// explicitly commit changes
+conn.commit();
+\end{lstlisting}
+
+Batch Writing ist im JPA-Standard nicht definiert, wird allerdings von manchen Implementierungen, z.B. der bei uns im Praktikum verwendeten Eclipse Link, trotzdem unterstützt. Dazu müssen zwei Einträge in der Persistence Unit vorgenommen werden, die , welcher Service für Batch-Operationen benutzt werden soll und wie viele Operationen in einem Batch zusammengefasst werden sollen:
+\begin{lstlisting}[language=XML]
+    <propertyname="eclipselink.jdbc.batch-writing" value="JDBC"/>
+    <propertyname="eclipselink.jdbc.batch-writing.size" value="1000"/>
+\end{lstlisting}

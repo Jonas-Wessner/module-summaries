@@ -1,0 +1,7 @@
+git clone https://github.com/apache/thrift
+sudo apt-get install libboost-dev libboost-test-dev libboost-program-options-dev libboost-system-dev libboost-filesystem-dev libevent-dev automake libtool flex bison pkg-config g++ libssl-dev
+cd thrift/
+./bootstrap.sh
+./configure
+make
+sudo make install

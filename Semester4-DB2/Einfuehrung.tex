@@ -1,0 +1,25 @@
+\section{Einführung}
+
+\subsection{Impedance Mismatch}
+Impedance Mismatch bezeichnet eine Gruppe von typischen Schwierigkeiten, mit denen sich auseinander gesetzt werden muss, wenn eine Anwendung, die in einer objektorientierten Programmiersprache geschrieben ist, mit einer relationalen Datenbank zusammenarbeiten soll.\\
+Objektorientierte Sprachen benutzen dabei vor allem folgende Konzepte, die nicht in relationalen Datenbanken vorkommen:
+\begin{itemize}
+    \item Inheritance
+    \item Komposition - Listen und komplexe Objekte können Attribute eines Objekts sein
+    \item Objektidentität durch Referenzgleichheit oder überladenen Equality-Operator
+\end{itemize}
+
+Relationale Datenbanken nutzen vor allem folgende Konzepte, die nicht in der Objektorientierung vorkommen:
+\begin{itemize}
+    \item Identität eines Tupels mit Primärschlüssel
+    \item Fremdschlüssel mit FK-Contraints
+    \item Atomarität von Spaltenwerten (1. Normalform) mit nur primitiven Datentypen
+\end{itemize}
+
+\subsection{Object-Relational Mapping - ORM}
+Object-relational mapping bezeichnet die Gruppe von Lösungsansätzen, die sich mit dem Konvertieren von Daten zwischen der relationalen und objektorientierten Welt befasst. Dabei versuchen sie dementsprechend mit dem Impedance Mismatch möglichst gut umzugehen. Das Ziel ist dabei, dass dieses mapping weitestgehend automatisiert von Statten geht und die Vorteile beider "Welten" hervorgehoben werden.\\
+Es existieren mehrere Ansätze, die man i.d.R. in Top-Down oder Bottom-Up einordnen kann.\\
+Bei \textbf{Top-Down}-Ansätzen konvertiert ein OR-Mapper die Klassen eines Anwendungsprogramms in ein Datenbankschema. Dementsprechend kümmert es sich um die Erstellung und den Zugriff auf die Datenbank. Ein Beispiel für einen Top-Down-Ansatz ist z.B. die JPA (Java Persistence API), die in diesem Dokument noch näher betrachtet wird.\\
+Bei \textbf{Bottom-Up}-Ansätzen wird mittels eines Reverse-Engeneering-Tools aus einem existierenden Datenbankschema versucht ein objektorientiertes Modell zu extrahieren. Dieser Ansatz wird in diesem Dokument nicht weiter verfolgt.\\
+\\
+Darüber hinaus befassen sich ORM-Tools/Frameworks i.d.R. auch mit \textbf{Transaktionsmanagement} und \textbf{Caching}. Dies sind Aufgaben, die über die Lösung des Impedance Mismatch hinaus gehen.

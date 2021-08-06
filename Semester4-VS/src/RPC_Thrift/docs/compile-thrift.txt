@@ -1,0 +1,1 @@
+g++ -o server-executable server-main.cpp gen-cpp/Example.* -lthrift

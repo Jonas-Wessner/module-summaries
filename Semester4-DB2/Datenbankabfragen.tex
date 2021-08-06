@@ -1,0 +1,119 @@
+\section{Datenbankabfragen - JPA Query Interface}
+
+Das JPA Query Interface ist eine Programmierschnittstelle, die Klassen zur Abfrage von Daten, die mittels JPA persistiert wurden, abzufragen. Die JPA bietet 3 verschiedene Ansätze, die alle ihre Vor- und Nachteile mit sich bringen:
+
+\subsection{JPQL}
+Die JPQL (Java Persistence Query Language) ist eine Datenbanksprache, die syntaktisch sehr stark an SQL angelegt ist. Hierbei werden Anfragen auf Basis von Klassen gestellt. Der OR-Mapper findet dann heraus wie die Klassen relational gespeichert sind, erzeugt die entsprechenden SQL-Queries aus dem JPQL-Query und mappt die Ergebnisse der SQL-Queries direkt in Objekte der abgefragten Klasse. Die JPQL ist vom konkreten darunterliegenden DBMS unabhängig, wodurch Portierbarkeit gewährleistet wird. Allerdings können deshalb auch DBMS-spezifische Features nicht genutzt werden.\\
+Die Methoden zur Erstellung von Queries ist mit folgenden Methoden möglich:
+\begin{itemize}
+    \item \lstinline{EntityManager.createQuery(String jpql);} Erstellen einer dynamischen Query, die zur Laufzeit kompiliert wird.
+    \item \lstinline{EntityManager.createNamedQuery(String queryName);} Abrufen einer statischen Query, die zur Kompilierzeit des Java-Programms kompiliert wird und typsicher ist. Diese Query muss zuvor in einer Annotation definiert sein.
+\end{itemize}
+
+\subsubsection{Dynamische Queries}
+
+Eine dynamische Query wird durch den Aufruf von \\
+\lstinline{EntityManager.createQuery(String jpql);}\\
+erzeugt. Dabei ist das Argument eine Abfrage in der Sprache JPQL. Ein Beispiel wäre:\\
+
+\lstinline{em.createQuery("select e from Employee e");}\\
+
+Diese Query wird in der DB alle relationalen Repräsentationen von Objekten der Klasse \lstinline{Employee} suchen, daraus die entsprechenden Objekte erzeugen und diese zurückliefern.\\
+Es ist auch möglich \textbf{nur einzelne Attribute einer Klasse} zu erhalten. In diesem Fall ist das Ergebnis dann eine Liste von Arrays, bei der jedes Array Element ein Attribut enthält:\\
+
+\lstinline{em.createQuery("select e.id, e.name from Employee e");}\\
+
+Diese Query liefert also eine Liste von Arrays mit 2 Elementen.\\
+Es ist auch möglich \textbf{parametrisierte Queries} zu erzeugen. Diese enthalten Parameter, die mit einem Doppelpunkt gekennzeichnet werden. Diese Parameter können dann z.B. mit Nutzereingaben gefüllt werden. Dabei werden alle für JPQL relevanten Schlüsselwörter u.Ä. escaped, sodass eine SQL injection verhindert werden kann:\\
+
+
+\begin{lstlisting}
+    var query em.createQuery("select e from Employee e where e.name = :name");
+    query.setParameter("name", "Smith");
+\end{lstlisting}
+
+\textbf{Ausführen von Queries:}\\
+
+Sobald eine Query erzeugt wurde, kann sie ausgeführt werden. Dies geschieht mit einem der folgenden Aufrufe:
+\begin{itemize}
+    \item \lstinline{query.getResultList();} Gibt eine Liste von Ergebnisobjekten zurück, über die iteriert werden kann
+    \item \lstinline{query.getSingleResult();} Gibt genau ein Ergebnisobjekt zurück. Wirft eine Exception, falls mehr als ein Objekt oder kein Objekt gefunden wird. Kann benutzt werden, wenn mit Sicherheit (z.B. bei Abfrage nach einem Objekt mit einem bestimmten PK) nur ein Objekt zurückgegeben wird.
+    \item \lstinline{query.executeUpdate();} Kann für Massen Updates und Deletes verwendet werden.
+\end{itemize}
+
+\textbf{Beispiel für Ausführen von Queries:}\\
+
+\begin{lstlisting}
+    List resultList = em.createQuery("select e from Employee e").getResultList();
+    
+    for(Iterator i = resultList.iterator(); i.hasNext();){
+        Employee e = (Employee) i.next();
+        System.out.println(e.toString());
+    }
+\end{lstlisting}
+
+\subsubsection{(Statische) Named Queries}
+
+Im Gegensatz zu normalen Queries, bei denen das JPQL zur Laufzeit interpretiert wird und damit Syntaxfehler zur Laufzeit möglich sind, können Named Queries bereits zur Kompilierzeit des Java Programms gecheckt werden.\\
+Dazu wird eine Query mit einer Annotation direkt an einer Klasse definiert. Die Query kann dann im Code über ihren Namen gefunden werden.\\
+Die Vorteile von Named Queries sind:
+\begin{itemize}
+    \item Syntaxüberprüfung zur Kompilierzeit
+    \item Performance, wegen Vorkompilierung
+    \item Keine Code Replikation bei häufig verwendeten Queries
+\end{itemize}
+
+\textbf{Beispiel für Named Queries:}\\
+Definition als Annotation:
+
+\begin{lstlisting}
+    @Entity
+    @NamedQueries({
+        @NamedQuery(name="Employee.findAll",
+            query="select e from Employee e"),
+        @NamedQuery(name="Employee.findByName",
+            query="select e from Employee e where e.name=:name")}) 
+    public class Employee implements Serializable{ ... }
+\end{lstlisting}
+
+Abrufen der Query:
+
+\begin{lstlisting}
+    List resultList = em.createNamedQuery("Employee.findAll").getResultList();
+    ...
+    List resultList = em.createNamedQuery("Employee.findByName").setParameter("name", "Smith").getResultList(); 
+\end{lstlisting}
+
+\subsubsection{Implizite JOINs}
+
+Da wir bei der Verwendung von JPQL eine Abstraktion benutzen, welche die wahren ausgeführten SQL-Queries vor uns verbirgt, kann es vorkommen, dass eine JPQL Anfrage implizite JOINS erzeugt. Da JOINS Performance kosten, sollten wir uns dieser Tatsache bewusst sein. Implizite Joins entstehen immer dann, wenn ein Attribut einer Klasse zurückgeliefert werden soll, das selbst wieder eine Entity-Class ist. Denn diese zwei Klassen werden von JPA in verschiedenen Relationen gespeichert.\\
+Beispiel, bei dem sowohl \lstinline{Order} als auch \lstinline{Customer} Entity-Classes sind:
+
+\begin{lstlisting}
+    List resultList = em.createQuery("select o.customer from Order o").getResultList();
+\end{lstlisting}
+
+\subsubsection{Explizite JOINs}
+
+Explizite JOINs sind in JPQL auch möglich. Diese sind aber nur nötig, wenn 2 Klassen gejoint werden sollen, die in keiner Klassenrelation stehen.
+
+\subsection{JPA Native SQL Queries}
+
+Mit der Methode \lstinline{EntityManager.createNativeQuery(String sql)} kann eine native SQL Query erzeugt werden. Der Vorteil davon ist, dass auch DBMS-Spezifische Features genutzt werden können. Der große Nachteil ist, dass der ORM uns dann nicht die Arbeit mit der relationalen DB abnimmt und wir somit die Stärken von JPA nicht nutzen können.
+
+\subsection{JPA Criteria API}
+
+In der JPA Criteria API wird zusätzlich zum Klassenmodell noch ein statisches Metamodell erstellt, das für eine bestimmte Persistence Unit bestimmt ist. Die Queries werden dann objektorientiert basierend auf diem Metamodell formuliert.
+
+\textbf{Vorteile:}
+
+\begin{itemize}
+    \item Typsicherheit und Syntax zur Kompilierzeit überprüft
+\end{itemize}
+
+\textbf{Nachteile:}
+
+\begin{itemize}
+    \item Komplexe Queries werden sehr unübersichtlich
+    \item Umstieg von SQL gewöhnungsbedürftig
+\end{itemize}
