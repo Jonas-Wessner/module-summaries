@@ -1,10 +1,45 @@
-\section{Metrics for Evaluating predictions}
+\section{Metrics for evaluating predictions}
+
+The following metrics can be used to analyze the quality of a \textit{classification model}.
 
 \subsection{Confusion Matrix}
+
+\includegraphics[width=400px]{confusion-matrix.png}
+
+\subsection{Accuracy}
+
+Accuracy answers the question \quotes{\textit{What is the probability that a prediciton is correct?}}.
+
+$$
+    Acc = \frac{TP + TN}{TP + TN + FP + FN}
+$$
+
+It is only good, if the real distribution of positive and negatives in the data is close to symmetric.
+
 \subsection{Precision}
+
+Precision answers the question \quotes{\textit{If we classify something as positive, how probable is it that it is actually positive?}}.
+
+$$
+    Precision = \frac{TP}{TP + FP}
+$$
+
 \subsection{Recall}
+
+Recall a.k.a. sensitivity answers the question \quotes{\textit{If a sample is positive, what is the probability we also label it as positive?}}.
+
+$$
+    Recall = \frac{TP}{TP + FN}
+$$
+
 \subsection{F1 Score}
-\subsection{Importance of the metrics}
+
+The F1-score divides the true positives by the sum of the true positives and the mean of the false positives and false negatives. This a high F1-score requires the model to make not few false predictions in either direction. Therefore F1-score is better than accuracy if the real distribution of positive and negative values in the dataset is uneven.
+
+$$
+    F1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall} = \frac{TP}{TP + \frac{1}{2} \cdot (FP + FN)}
+$$
+
 
 \section{One-hot encoding}
 
