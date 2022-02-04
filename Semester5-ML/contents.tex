@@ -67,9 +67,23 @@ Instead we can use one-hot encoding resolving that issue. For each output class 
     OtherAnimal & $\rightarrow$ & $[0, 1]$ & $\longrightarrow$ &       \\
 \end{tabular}
 
-\section{Overfitting and underfitting}
+\section{Overfitting and Underfitting}
+
+In supervised machine learning we usually have a function that determines a specific target parameter (e.g. if a passenger on the titanic survives). However, the function may not be accurate for all samples since the data may include errors (e.g. measurement errors). As we do not know the real underlying function we try to approximate it with supervised machine learning.\\
+If a model is underfitted, it does not take all parameters of the real underlying function into account and therefore is not accurate.\\
+If a model is overfitted, it takes parameters into account that do not apply to the underlying function but where given in the training samples. Overfitting leads to bad results on unseen data as parameters have been learned that are no general indicators for an event and can not be used on other data than the training samples. Overfitting may also occur if the paramters are tuned in a too detailed way that is only applicable to errors or inaccuracy of measurements in the training data.
 
 \subsection{How can it be detected?}
+
+To detect underfitting and overfitting we can validate the model after each training epoch by letting it make predictions on unseen data and calculating a chosen metric (in the figure we calculate a loss) over that data. Now we can make the following interpretations of the graph:
+
+\begin{enumerate}
+    \item As long as the loss is decreasing the model is still underfitted and shall be trained for more epochs.
+    \item If the los is increasing the model is becoming more and more overfitted and training can be stopped.
+    \item If the loss remains unchanged the model has reached the global or a local optimum.
+\end{enumerate}
+
+\includegraphics[width=400px]{underfitting-overfitting.png}
 
 \subsection{Possible solutions}
 
