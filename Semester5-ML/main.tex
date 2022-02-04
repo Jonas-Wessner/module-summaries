@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{caption}
+\usepackage[skip=0.5ex]{subcaption}
+\usepackage[left=3cm,right=3cm,top=2cm,bottom=2cm]{geometry}
+
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+\definecolor{linkcolor}{rgb}{0, 0.05, 0.3}
+
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Machine Learning Exam Preparation},
+    pdfpagemode=FullScreen,
+    }
+\usepackage{parskip} % do not indent first lines
+\usepackage{bookmark}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{wrapfig} % wrap text around images/figures
+
+\newcommand{\quotes}[1]{''#1''}
+
+\graphicspath{ {./images/} }
+
+\begin{document}
+\title{Exam Preparation\\Machine Learning S. 5 Bachelor WS21/22}
+\author{Jonas Weßner}
+\maketitle
+\tableofcontents
+\newpage				% Neue Seite nach TOC
+
+\input{contents.tex}
+
+\end{document}
