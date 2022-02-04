@@ -87,6 +87,23 @@ To detect underfitting and overfitting we can validate the model after each trai
 
 \subsection{Possible solutions}
 
+\begin{enumerate}
+    \item \textbf{Stop early:}\\
+          Stop training to avoid overfitting if your score on the validation set does not increase anymore.
+    \item \textbf{k-fold-cross-validation:}\\
+          Split dataset into k groups and train k-times on k-1 groups while using the remaining group as validation data. This way after each epoch we train on data that has not been seen in that epoch while training more than one epoch.
+    \item \textbf{Increase dataset size:}\\
+          This has positive influence on underfitting and overfitting.
+    \item \textbf{Data augmentation:}\\
+          Create more data by applying some tranformations to the samples. E.g. flip and crop images. This helps preventing that the model learns too much details about individual samples.
+    \item \textbf{Reduce Complexity:}\\
+          Use pooling layers and less neurons to decrease overfitting.
+    \item \textbf{Regularizaiton:}\\
+          Penalizing big numbers of coefficients.
+    \item \textbf{Use Ensembling:}\\
+          Combine predictions of multiple ML-models.
+\end{enumerate}
+
 \section{PCA - principal component analysis}
 
 \subsection{Reasons for using PCA}
