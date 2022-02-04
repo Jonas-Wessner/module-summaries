@@ -43,6 +43,30 @@ $$
 
 \section{One-hot encoding}
 
+Many machine learning algorithms cannot have a categories as ouput values. Therefore if our goal is a categorization of samples we need to make a transformation of labels to numerical values.
+
+\subsubsection*{Step 1: Integer Transformation}
+First we must convert all different variants of the category into distinct integer values, e.g.:\\
+
+\begin{tabular}{l l l}
+    Dog         & $\rightarrow$ & 1 \\
+    Cat         & $\rightarrow$ & 2 \\
+    OtherAnimal & $\rightarrow$ & 3 \\
+\end{tabular}
+
+We can now train a machine learning model on that data and it will return one output value. To convert the models output back into classes we could pick the class where the ouput is the closest to the corresponding integer value.
+
+\subsubsection*{One-Hot Encoding}
+
+The problem with integer encoding is that we allow the model to that there is a defined order for the classes. E.g. in the above shown class mapping an ML model could assume that all other animals (3) are closer to cats (2) than to dogs (1). However, as this is not the case at all, using integer encoding might lead to poor predictions.\\
+Instead we can use one-hot encoding resolving that issue. For each output class we create an output neuron / node with the value range of $[0, 1]$. The models predictions are converted back to the classes by taking the maximum of all values of the individual classes. The produces output for the individual classes can be seen as a probability that the sample is of instance of the corresponding class.
+
+\begin{tabular}{l l l l l l}
+    Dog         & $\rightarrow$ & $[0, 1]$ & $\longrightarrow$ &       \\
+    Cat         & $\rightarrow$ & $[0, 1]$ & $\longrightarrow$ & $max$ \\
+    OtherAnimal & $\rightarrow$ & $[0, 1]$ & $\longrightarrow$ &       \\
+\end{tabular}
+
 \section{Overfitting and underfitting}
 
 \subsection{How can it be detected?}
