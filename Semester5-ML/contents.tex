@@ -107,12 +107,49 @@ To detect underfitting and overfitting we can validate the model after each trai
 \section{PCA - principal component analysis}
 
 \subsection{Reasons for using PCA}
-\subsection{Selection of good values for compon}
+
+If we have data with $n$ variables/features we can use principal component analysis to reduce the amount of features to $k$ with $k < n$ features while keeping the most important features of the data and eliminating the less important features. Reduction of features is useful to plot the data (because plots with more than 3 features are non-trivial) and also for machine-learning models to increase computation speed.
+
+\subsection{Algorithm}
+\begin{enumerate}
+    \item Calculate mean for each variable. Doing that we also get the center of the data as $(mean(x_{1}), mean(x_{2}), ... mean(x_{n}))$.
+    \item Now we want to shift the data so that its center is at the center of the coordinate system. We can subtract each individual mean from the corresponding variable to do that.
+    \item We now compute the principle component 1 PC1. We are searching for a vector (straight line) that fits the data in the $x_{1}$ axis best. That means we search for a line where the squared distances of the data points to this line are minimal. It is important that this is equivalent to finding a line where the data is spread out the most if we project it onto the line.
+    \item For each other variable $v_{2}$ to $v_{n}$ we draw a line that is orthogonal to all preceding lines and rotate it until it represents the data best for the given variable in the same way as with the first line. These lines are $PC_{2}$ to $PC_{n}$.
+    \item As said, the data points of the features are spread out as much as possible along the PCs now. This means that the variance and therefore also the amount of information is maximized for the specific variable if we project the data onto that PC. Now we can take the $k$ PCs with the greatest variance (also called eigenvalues here) and use them to represent our data.
+\end{enumerate}
 
 \section{Python Basics}
 
 \subsection{Slicing}
+
+\begin{lstlisting}
+    a[start:stop]       # items start through stop-1
+    a[start:]           # items start through the rest of the array
+    a[:stop]            # items from the beginning through stop-1
+    a[:]                # a copy of the whole array
+    a[start:stop:step]  # start through not past stop, by step
+\end{lstlisting}
+
 \subsection{Data Extraction with Pandas}
+
+\begin{lstlisting}
+    df.head(5)                          # show first 5 lines
+    df.tail(3)                          # show last 3 lines
+    df.columns              
+    df.describe()                       # statistic summary of data
+    df["Survived"]                      # get survived column as pandas.Series
+    df[0:3]                             # get the first 3 rows with all columns
+    df.loc["2013-01-03"]                # Select a row by the value of the index column
+    df.loc["2013-01-03", "name"]        # Select the value of the `name` column of that row
+    df.iloc[5]                          # Select the 5th row by its index
+    df[df["income"] > 1000]             # selecting rows via a boolean array
+    df.dropna(how="any")                # drop all rows that contain null values
+    df.mean()                           # calculates mean of each column and returns a Series
+    df1.fillna(value=5)                 # replace all NaN values with 5
+    df.apply(lambda x: x.max() - 10)    # apply a function to each data point
+\end{lstlisting}
+
 
 \section{Regularization}
 \subsection{What is regularization}
