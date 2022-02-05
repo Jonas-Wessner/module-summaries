@@ -152,10 +152,39 @@ If we have data with $n$ variables/features we can use principal component analy
 
 
 \section{Regularization}
+
 \subsection{What is regularization}
-\subsection{Lasso}
+Regularization is the method of penalizing complex model e.g. models with a lot of parameters. It is used to avoid overfitting.\\
+
+A common loss function for evaluating a model is the residual sum of squares ($RSS$).
+
+$$
+    RSS = \sum_{i=1}^{n} (y_{i} - y'_{i})^{2}
+$$
+
+When evaluating the model the loss function shall be minimized.\\
+But we can also use other loss functions that include regularization terms as will be shown in the following.
+
 \subsection{Ridge}
+
+Ridge adds the sum of the squares of coefficients $w$ to the RSS which makes the loss function prefer smaller coefficients. However coefficients will never be zeroed out using Ridge.
+
+$$
+    Ridge = RSS + \lambda \sum_{i=0}^{n} w_{i}^{2}
+$$
+
+\subsection{Lasso}
+
+Lasso adds the sum of the absolutes of coefficients $w$ to the RSS which makes the loss function prefer smaller coefficients and possibly drive some coefficients to zero i.e. eliminating them.
+
+$$
+    Ridge = RSS + \lambda \sum_{i=0}^{n} |w_{i}|
+$$
+
+
 \subsection{Dropout}
+
+As opposed to Ridge and Lasso, which are used mainly used with linear models, dropout is a regularization method used for neural networks. Using dropout means that the output values of some randomly chosen nodes of a layer (which may not be the output-layer) are ignored. This way the net is meant to be more robust to noise in the training data, because it the dropped out nodes will be different in every epoch and therefore the training experience will also slightly differ.
 
 \section{Machine Learning Tasks}
 
