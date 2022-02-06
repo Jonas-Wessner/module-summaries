@@ -203,16 +203,16 @@ Clustering is an \textit{unsupervised} machine learning task for grouping data p
 \section{MLP - Multi Layer Perceptron}
 
 \begin{figure}[h]
-    \caption{An MLP with one hidden layer.}
     \centering
     \includegraphics[width=300px]{MLP.png}
+    \caption{An MLP with one hidden layer.}
     \label{fig:mlp}
 \end{figure}
 
 \subsection{What is an MPL?}
 
 An MPL - multi layer perceptron - is a type of feed-forward artificial neural network (ANN) consisting of more multiple layers of perceptrons.\\
-A perceptron is a single artificial neuron. It has a finite number of inputs with associated weights and one output. The output for a single perceptron is defined by the sum of all weights combined with an \hyperref[sec:activation_functions]{activation function}. The activation function may be as simple as a threshold function returning 0 or 1 or also something more complicated. Single perceptrons can only model linear functions (however with regard to multiple variables (inputs)) as the output is calculated as a polynomial of degree 1 of all inputs. However, with multiple layers of perceptrons we can also model non-linear functions, which is shown on the example of XOR in \hyperref[sec:solving_non_linear_problems_with_nns]{section \ref*{sec:solving_non_linear_problems_with_nns}}.
+A perceptron is a single artificial neuron. It has a finite number of inputs with associated weights and one output. The output for a single perceptron is defined by the sum of all weights combined with an \hyperref[sec:activation_functions]{activation function}. Single perceptrons can only model linear functions (however with regard to multiple variables (inputs)) as the output is calculated as a polynomial of degree 1 of all inputs. However, with multiple layers of perceptrons we can also model non-linear functions, which is shown on the example of XOR in \hyperref[sec:solving_non_linear_problems_with_nns]{section \ref*{sec:solving_non_linear_problems_with_nns}}.
 
 Note: You can also refer to an MLP as an ANN which has the following properties:
 \begin{enumerate}
@@ -245,14 +245,71 @@ Therefore when calculating the amount of parameters in an MPL with biases in eve
 
 \section{Feature map calculation in convolutional NN}
 
+TODO: do this
+
 \section{Input and output sizes in Neural networks}
+
+TODO: do this
+
 Describe here: Size of inputs and outputs in MLP and convolutional NN calculated from image size and the number of output classes.
+
 
 \section{Activation Functions}
 \label{sec:activation_functions}
-\subsection{Softmax}
+
+An activation function is a function that is applied to the output of each node of a ANN. A simple activation function could be one that puts out either $0$ or $1$ depending on a threshold. Three more activation functions shall be presented in the following.
+
+\subsection{ReLU}
+
+TODO: explain why this is used
+
+$$
+    relu(x) =
+    \begin{cases}
+        \begin{rcases*}
+            x & \quad x $>$ 0, \\
+            0 & \quad x $\leq$ 0 \\
+        \end{rcases*}
+    \end{cases}
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=150px]{ReLU.png}
+    \caption{ReLU activation function}
+    \label{fig:relu}
+\end{figure}
+
 \subsection{Sigmoid}
-\subsection{RELU}
+
+TODO: explain why this is used
+
+$$
+    sigmoid(x) = \frac{1}{1 + e^{-z}}
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=150px]{sigmoid.png}
+    \caption{Sigmoid activation function}
+    \label{fig:sigmoid}
+\end{figure}
+
+\subsection{Softmax}
+
+$$
+    softmax(x)_{j} = \frac{e^{x}}{\sum_{k=1}^{K}e_{k}^{x}}
+$$
+
+
+The softmax function is a function that is typically applied to all output values of a NN for a classification problem. We assume that we have $K$ classes (output neurons) and an input $x$. The softmax function transforms the output values of each $k$-th neuron in a way that they all together add up to one and can therefore seen as probabilities for the corresponding class.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=300px]{softmax.png}
+    \caption{Softmax activation function}
+    \label{fig:softmax}
+\end{figure}
 
 \section{Solving non-linear problems with NNs}
 
