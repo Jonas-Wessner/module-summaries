@@ -190,31 +190,74 @@ As opposed to Ridge and Lasso, which are used mainly used with linear models, dr
 
 \subsection{Classification}
 
-A \textit{supervised} machine learning task for predicting a target variable wich may have a finite number of possible values.
+Classification is a \textit{supervised} machine learning task for predicting a target variable wich may have a finite number of possible values.
 
 \subsection{Regression}
 
-A \textit{supervised} machine learning task for predicting a continuous target variable like the price of a house or the height of a human.
+Regression is a \textit{supervised} machine learning task for predicting a continuous target variable like the price of a house or the height of a human.
 
 \subsection{Clustering}
 
-An \textit{unsupervised} machine learning task for grouping data points to multiple clusters. The data points in one cluster shall be as similar as possible to each other while being as dissimilar as possible to data points in other clusters.
+Clustering is an \textit{unsupervised} machine learning task for grouping data points to multiple clusters. The data points in one cluster shall be as similar as possible to each other while being as dissimilar as possible to data points in other clusters.
 
-\section{MLP - Multi-Layer-Perceptron}
-\subsection{What is MPL?}
-\subsection{Calculation of a number of parameters with and without bias}
+\section{MLP - Multi Layer Perceptron}
+
+\begin{figure}[h]
+    \caption{An MLP with one hidden layer.}
+    \centering
+    \includegraphics[width=300px]{MLP.png}
+    \label{fig:mlp}
+\end{figure}
+
+\subsection{What is an MPL?}
+
+An MPL - multi layer perceptron - is a type of feed-forward artificial neural network (ANN) consisting of more multiple layers of perceptrons.\\
+A perceptron is a single artificial neuron. It has a finite number of inputs with associated weights and one output. The output for a single perceptron is defined by the sum of all weights combined with an \hyperref[sec:activation_functions]{activation function}. The activation function may be as simple as a threshold function returning 0 or 1 or also something more complicated. Single perceptrons can only model linear functions (however with regard to multiple variables (inputs)) as the output is calculated as a polynomial of degree 1 of all inputs. However, with multiple layers of perceptrons we can also model non-linear functions, which is shown on the example of XOR in \hyperref[sec:solving_non_linear_problems_with_nns]{section \ref*{sec:solving_non_linear_problems_with_nns}}.
+
+Note: You can also refer to an MLP as an ANN which has the following properties:
+\begin{enumerate}
+    \item Amount of layers $> 1$.
+    \item All layers are fully connected layers.
+\end{enumerate}
+
+\subsection{Number of parameters in MPLs}
+
+A parameter in a multi layer perceptron is one of the weights that are changed during training visualized by the lines between neurons.\\
+
+We declare the following variables:
+\begin{itemize}
+    \item $l_{i}$: amount of neurons in layer $i$.
+\end{itemize}
+
+If $l_{i}$ is the amount of neurons in layer $i$ starting with the input layer being layer $1$, then the number of parameters in an MLP without biases is:
+
+$$
+    \sum_{i=1}^{n-1}l_{i}\cdot{l_{i+1}}
+$$
+
+If the MLP has biases in every layer, the amount of biases is calculated as the sum of neurons in all layers except the input layer. This is because as \hyperref[fig:mlp]{figure \ref*{fig:mlp}} shows, biases are usually connected to every neuron of a layer and input layers have no biases:
+
+$$
+    \sum_{i=2}^{n}l_{i}
+$$
+
+Therefore when calculating the amount of parameters in an MPL with biases in every layer, of course add up both terms.
 
 \section{Feature map calculation in convolutional NN}
 
 \section{Input and output sizes in Neural networks}
 Describe here: Size of inputs and outputs in MLP and convolutional NN calculated from image size and the number of output classes.
 
-\section{Activation functions}
+\section{Activation Functions}
+\label{sec:activation_functions}
 \subsection{Softmax}
 \subsection{Sigmoid}
 \subsection{RELU}
 
 \section{Solving non-linear problems with NNs}
+
+\label{sec:solving_non_linear_problems_with_nns}
+
 Use example of logical function XOR here.
 
 \section{K-means}
