@@ -319,6 +319,15 @@ Use example of logical function XOR here.
 
 \section{K-means}
 
+The $k$-means algorithm is an algorithm which takes a set of data points and a positive integer $k$ as input. It then clusters similar data points into $k$ clusters. It favors clusters with low variance and similar size. $k$ must be chose in the application context and might be the number of known classes of data points.\\
+The algorithm works as follows:
+\begin{enumerate}
+    \item Randomly initialize $k$ points as \quotes{centers}" within the space of our data.
+    \item Associate each data point with its closest \quotes{center}
+    \item Update the centers to the center of all points associated with it.
+    \item Repeat the re-centering for a fixed amount of iterations or until convergence.
+\end{enumerate}
+
 \section{Gradient Descent}
 
 \section{Hyperparameters of ML models}
