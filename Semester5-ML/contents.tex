@@ -261,7 +261,7 @@ An activation function is a function that is applied to the output of each node 
 
 \subsection{ReLU}
 
-TODO: explain why this is used
+The ReLU function can be used to only respect a neuron if it has a positive output. It's advantages are that it is easy to compute and favors the reduction of connections between nodes, which would be the case if a neuron is outputting a value less than $0$.
 
 $$
     relu(x) =
@@ -282,10 +282,10 @@ $$
 
 \subsection{Sigmoid}
 
-TODO: explain why this is used
+The sigmoid function produces values in the range from $0$ to $1$. Also the values are symmetric with respect to the y-axis. This is very helpful when the output of a node is supposed to be interpreted as a probability.
 
 $$
-    sigmoid(x) = \frac{1}{1 + e^{-z}}
+    sigmoid(x) = \frac{1}{1 + e^{-x}}
 $$
 
 \begin{figure}[h]
