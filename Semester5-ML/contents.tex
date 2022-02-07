@@ -201,6 +201,7 @@ Regression is a \textit{supervised} machine learning task for predicting a conti
 Clustering is an \textit{unsupervised} machine learning task for grouping data points to multiple clusters. The data points in one cluster shall be as similar as possible to each other while being as dissimilar as possible to data points in other clusters.
 
 \section{MLP - Multi Layer Perceptron}
+\label{sec:mlp}
 
 \begin{figure}[h]
     \centering
@@ -315,11 +316,21 @@ The softmax function is a function that is typically applied to all output value
 
 \label{sec:solving_non_linear_problems_with_nns}
 
-Use example of logical function XOR here.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=300px]{mlp_xor.png}
+    \caption{MLP for calculating XOR}
+    \label{fig:mlp_xor}
+\end{figure}
+
+With a single \hyperref[sec:mlp]{perceptron} we can only fit linear functions. This is because a perceptrons output value is calculated as a linear function $output = a_{1} x_{1} + a_{2} x_{2} + ... a_{n} x_{n}$ of all it's $n$ inputs $x_{i}$ and weights $a_{i}$. However with multiple layers of perceptrons we can also fit non-linear functions. That means we can use multiple linear components (neurons) to build a non-linear model without explicitly using a polynomial model with degree $\geq 2$.
+
+An example of this is the non-linear logical function XOR shown in figure \ref{fig:mlp_xor}. As XOR is a logical function the amount of its inputs is predetermined to be $2$ ($x_{1}, x_{2}$). We cannot model XOR with a single perceptron using $2$ inputs to that one perceptron. However we can model XOR as a combination of 3 neurons. These 3 neorons then themselves model OR, NAND and NAND which results in XOR as combination. The bias neuron $x_{0}$ shown in figure \ref{fig:mlp_xor} is unnecessary.
 
 \section{K-means}
 
 The $k$-means algorithm is an algorithm which takes a set of data points and a positive integer $k$ as input. It then clusters similar data points into $k$ clusters. It favors clusters with low variance and similar size. $k$ must be chose in the application context and might be the number of known classes of data points.\\
+
 The algorithm works as follows:
 \begin{enumerate}
     \item Randomly initialize $k$ points as \quotes{centers}" within the space of our data.
@@ -349,4 +360,3 @@ The algorithm works as follows:
 
 
 \section{K-nearest Neighbors}
-
