@@ -153,6 +153,8 @@ If we have data with $n$ variables/features we can use principal component analy
 
 \section{Regularization}
 
+\label{sec:regularization}
+
 \subsection{What is regularization}
 Regularization is the method of penalizing complex model e.g. models with a lot of parameters. It is used to avoid overfitting.\\
 
@@ -343,12 +345,34 @@ The algorithm works as follows:
 
 \section{Hyperparameters of ML models}
 
-\subsection{Learning Rate}
-\subsection{Epochs}
-\subsection{Regularization}
 \subsection{Batch Size}
-\subsection{Convolution Kernel size}
-\subsection{Max-Pooling}
+
+Batch size is the number of data points shown to the net before the weights are adjusted using back-propagation. In real gradient descent the batch size is the dataset size. Then all weights are updated with regard to the mean error produced by all data points i.e. all data points affect each update of the weights directly. To increase learning speed we can also use batches of random sets of samples which will make us update more often with similar results.
+
+\subsection{Epochs}
+
+Epochs are the amount of times the net is shown the entire dataset while training.
+
+\subsection{Learning Rate}
+
+During back-propagation the parameters of the network are adjusted contrasting to the calculated error. The learning rate is a scalar that the error is multiplied with which therefore specifies to what extend the network shall learn. Too large learning rates can result in overshooting the minimum and non-convergence. Too Small learning rates can result in a slow learning process. In practice the learning rate is often chosen to be a value between 0.1 and 1. It is also possible to adjust the learning rate over time (often called decay) in order to learn faster in the beginning and then slow down the learning to smoothly approach the minimum of the loss function.
+
+\subsection{Regularization}
+
+Regularization is explained in \hyperref[sec:regularization]{section \ref*{sec:regularization}} in detail.
+
+\subsection{Convolution Kernel Size}
+
+When using convolutional layers in ANNs we use an $n \times n$ kernel (filter matrix). Usually an odd number is chosen for $n$ such that the kernel has a center, most popular is 3, sometimes 5. Then we slide the filter over the image such that each pixel has been in the center of the kernel once. We calculate the value of an output pixel, which is the pixel currently in the center of the kernel, as the dot-product of the kernel and the pixels of the image. Note that we would do this in multiple dimensions if we had a multi-channel image like RGB. Using convolutional layers can extract information like edges from the picture if the values for the elements of the kernel are chosen in a way that they calculate the gradient of adjacent pixels.
+
+\subsection{Pooling Layers}
+
+Pooling layers can be used in ANNs to down sample the feature maps. In general it is always better if data can be reduced while information is retained, as this decreases the number of nodes and therefore parameters in following layers and therefore speeds up the computation. Pooling layers typically use a $2 \times 2$ kernel with a stride of $2$. They therefore reduce the amount of features of an image by factor $4$. Pooling layers are often used after convolutional layers to decrease the size of the representation of the extracted features. In practice two types of pooling layers are most prominent:
+
+\begin{itemize}
+    \item \textbf{Max pooling layers} calculate the maximum value within the scope of the kernel.
+    \item \textbf{Average polling layers} calculate the averyge value within the scope of the kernel.
+\end{itemize}
 
 \section{Logistic Regression and Cross Entropy}
 
