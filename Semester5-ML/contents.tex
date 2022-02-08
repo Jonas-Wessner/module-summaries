@@ -343,6 +343,8 @@ The algorithm works as follows:
 
 \section{Gradient Descent}
 
+TODO: do this
+
 \section{Hyperparameters of ML models}
 
 \subsection{Batch Size}
@@ -376,11 +378,47 @@ Pooling layers can be used in ANNs to down sample the feature maps. In general i
 
 \section{Logistic Regression and Cross Entropy}
 
+TODO: do this
+
 
 \section{Linear Regression and Normal Equation}
+
+TODO: do this
 
 
 \section{Decision Trees}
 
+A decision tree is a binary tree that maps data points recursively to leaf nodes. Each leaf node is associated with one class and this way the result of traversing a decision tree with a given data point can be used for classification problems.\\
+The interesting problem is how should a decision tree choose it's conditions in it's non-leaf nodes? As the tree is most efficient if the most information is extracted in each node, we recursively try to achieve that. We start with one root node and search e.g. with a grid search for a condition that maximizes the information gain at that node. Then we repeat for both child nodes. We stop at a node if it only contains data points of the same class or if we hit a given threshold of entropy or nodes.\\
+
+Now lets look at how information gain is defined. To look at that we must first understand entropy. Entropy is value between 0 that shows the the uncertainty of a decision or put differently the mean information contained in one data point. If $p_{i}$ is the probability that a data point is an instance of class $i$ the entropy is calculated as follows:
+
+$$
+    H = -\sum_{i=1}^{N}p_i \log_2{(p_i)}
+$$
+
+It follows that the entropy is maximized i.e. equal to $1$ if the amount of data points belonging to one specific class is equal for all classes. Likewise the entropy is minimal i.e. equal to $0$ if all data points belong to the same class.\\
+
+Information Gain is now defined as the loss of entropy per data point. The formula is as follows, where $w_{i}$ is the percentage of the data of the parent being mapped to child $i$ and $n$ being the the number of child nodes (in decision trees $n$ is always 2).
+
+$$
+    IG(Parent) =  H(Parent) - \sum_{i=1}^{n} w_{i} \cdot H(Child)
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=300px]{decision_tree_classifier_1.png}
+    \caption{Illustration of a simple decision tree for data with two features $x_{0}$ and $x_{1}$}
+    \label{fig:mlp}
+\end{figure}
+
+
+\section{Random Forest}
+
+Decision trees are highly sensible to the training data as their shape may be completely different for different training data. Therefore overfitting is a big issue. Random forest can solve this issue by using multiple decision trees on random subsets of the data and combining the prediction results. The algorithms for sampling and combining the trees here are \textit{bootstrapping} and \textit{aggregating}, which are also called \textit{bagging} in this combination.\\
+Bootstrapping is performed by taking a random sample out of the dataset $n$ times. Here it it possible that a data point is chosen multiple times or never. This sampling is repeated $k$ times for the generation of a random forest with $k$ trees. Then a decision tree is build individually for each bootstrapped dataset.\\
+When predicting on new unseen data the predictions of all trees are combined. For regression problems we calculate the mean, for classification problems the majority wins.
 
 \section{K-nearest Neighbors}
+
+TODO: do this
