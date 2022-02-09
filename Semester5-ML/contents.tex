@@ -248,7 +248,14 @@ Therefore when calculating the amount of parameters in an MPL with biases in eve
 
 \section{Feature map calculation in convolutional NN}
 
-TODO: do this
+Feature map is a term mostly used to describe the output of a convolutional layer. We calculate one element of this output by calculating the dot-product of the convolutional kernel and the respective input features while centering the kernel on the feature to map.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=250px]{feature_map_calulation.png}
+    \caption{Calculation of a feature map with a $3 \times 3$ kernel with the values $(1, 0, 1, 0, 1, 0, 1, 0, 1)$}
+    \label{fig:feature_map_conv_net}
+\end{figure}
 
 \section{Input and output sizes in ANNs}
 
@@ -366,7 +373,7 @@ When using convolutional layers in ANNs we use an $n \times n$ kernel (filter ma
 
 \subsection{Pooling Layers}
 
-Pooling layers can be used in ANNs to down sample the feature maps. In general it is always better if data can be reduced while information is retained, as this decreases the number of nodes and therefore parameters in following layers and therefore speeds up the computation. Pooling layers typically use a $2 \times 2$ kernel with a stride of $2$. They therefore reduce the amount of features of an image by factor $4$. Pooling layers are often used after convolutional layers to decrease the size of the representation of the extracted features. In practice two types of pooling layers are most prominent:
+Pooling layers can be used in ANNs to down sample the feature maps i.e. reduce the amount of features. In general it is always better if data can be reduced while information is retained, as this decreases the number of nodes and therefore parameters in following layers and therefore speeds up the computation. Pooling layers typically use a $2 \times 2$ kernel with a stride of $2$. They therefore reduce the amount of features of an image by factor $4$. Pooling layers are often used after convolutional layers to decrease the size of the representation of the extracted features. In practice two types of pooling layers are most prominent:
 
 \begin{itemize}
     \item \textbf{Max pooling layers} calculate the maximum value within the scope of the kernel.
