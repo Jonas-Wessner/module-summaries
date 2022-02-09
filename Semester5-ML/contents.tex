@@ -250,12 +250,9 @@ Therefore when calculating the amount of parameters in an MPL with biases in eve
 
 TODO: do this
 
-\section{Input and output sizes in Neural networks}
+\section{Input and output sizes in ANNs}
 
-TODO: do this
-
-Describe here: Size of inputs and outputs in MLP and convolutional NN calculated from image size and the number of output classes.
-
+The size of the input and the output layer in an ANN is predetermined by the problem to be solved. The input layer has as many neurons as the data has features. Of course we can use mechanisms for preprocessing our data first which would then change the dimensions of it's feature vectors and therefore also the number of neurons in the input layer. The size of the output layer is determined by the expected output. For a binary classification problem the output may be a single neuron. For classification with one-hot-encoding the number of neurons in the output layer is equal to the number of classes to predict.
 
 \section{Activation Functions}
 \label{sec:activation_functions}
