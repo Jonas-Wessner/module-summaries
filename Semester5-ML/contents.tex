@@ -347,7 +347,23 @@ The algorithm works as follows:
 
 \section{Gradient Descent}
 
-TODO: do this
+Gradient descent describes the method of minimizing a cost function of a ML algorithm. We have a given machine learning algorithm and a cost function e.g. the root of squared residuals. In (normal/ batch) gradient descent we would first randomly initialize all parameters in the ML model. Then we would make predictions for all training samples and calculate the loss function of the desired output and the real output. Then we would update all parameters against the gradient of the cost function effectively lowering the gradient for the average sample. We would repeat that until the average value of the cost function on training samples converges.
+
+Stochastic gradient descent (SGD) updates the parameters of the model after each individual sample. This makes it change more quickly but not with respect to all data. So individual steps may actually sometimes go in the wrong direction.
+
+Mini-batch gradient descent updates the weights of the model with respect to a random set of samples also called batch. The hope is that the batch is large enough to be at least somewhat representative for the whole dataset and therefore drive the cost function towards the minimum without having to compute the output for all training samples.
+
+When adjusting the parameters the gradient of the cost function is multiplied with a scalar which is called \hyperref[sec:learning_rate]{learning rate}. As the gradient/slope of the const function naturally decreases as it approaches a minimum the adjustments of the parameters (step size) also naturally decrease. Therefore it is usually not necessary to change the learning rate over time in order to achieve convergence as long as the learning rate is set to some reasonable value.
+
+One problem of gradient descent is that we can approach a local minimum of the cost function quite easily, however, it is not guaranteed that this is the global minimum. To overcome this issue a simple solution is to perform gradient descent multiple times with different random initializations of the parameter with the hope that at least one of the iterations we end up at the global minimum of the cost function.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=300px]{gradient_descent_1.png}
+    \caption{Illustration of a gradient descent algorithm approaching the minimum of a loss function.}
+    \label{fig:gradient_descent}
+\end{figure}
 
 \section{Hyperparameters of ML models}
 
@@ -360,6 +376,7 @@ Batch size is the number of data points shown to the net before the weights are 
 Epochs are the amount of times the net is shown the entire dataset while training.
 
 \subsection{Learning Rate}
+\label{sec:learning_rate}
 
 During back-propagation the parameters of the network are adjusted contrasting to the calculated error. The learning rate is a scalar that the error is multiplied with which therefore specifies to what extend the network shall learn. Too large learning rates can result in overshooting the minimum and non-convergence. Too Small learning rates can result in a slow learning process. In practice the learning rate is often chosen to be a value between 0.1 and 1. It is also possible to adjust the learning rate over time (often called decay) in order to learn faster in the beginning and then slow down the learning to smoothly approach the minimum of the loss function.
 
