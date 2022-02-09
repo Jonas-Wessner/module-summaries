@@ -405,6 +405,8 @@ $$
     IG(Parent) =  H(Parent) - \sum_{i=1}^{n} w_{i} \cdot H(Child)
 $$
 
+In practice to avoid overfitting we would usually stop early i.e. we would not construct the entire tree until each leaf node has the entropy 0. Instead we would define limiting conditions like \textit{maximum tree depth}, \textit{maximum features} and \textit{minimum samples per leaf}.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=300px]{decision_tree_classifier_1.png}
@@ -419,6 +421,35 @@ Decision trees are highly sensible to the training data as their shape may be co
 Bootstrapping is performed by taking a random sample out of the dataset $n$ times. Here it it possible that a data point is chosen multiple times or never. This sampling is repeated $k$ times for the generation of a random forest with $k$ trees. Then a decision tree is build individually for each bootstrapped dataset.\\
 When predicting on new unseen data the predictions of all trees are combined. For regression problems we calculate the mean, for classification problems the majority wins.
 
-\section{K-nearest Neighbors}
+\section{K-nearest-neighbors}
 
-TODO: do this
+K-nearest-neighbors (KNN) is also referred to as:
+
+\begin{itemize}
+    \item Instance-Based Learning,
+    \item Lazy Learning,
+    \item Non-Parametric Learning.
+\end{itemize}
+
+The main idea of KNN is to store the entire training dataset in a data structure and then when predicting a new value find the K most similar data points in the training data set. Then the target values of those K neighbors are aggregated. It follows that no training is needed. Now for the implementation of KNN the following has to be considered:
+
+\begin{enumerate}
+    \item How to store the training dataset for an efficient lookup? Of course we do not want to have to a linear search for finding the K neighbors.
+    \item How to calculate the similarity of data points?
+    \item How to aggregate the target values of the neighbors to one scalar prediction value?
+\end{enumerate}
+
+\subsection*{Dataset storage}
+
+For an efficient lookup usually a kind of tree structure is used.
+
+\subsection*{Calculation of similarity}
+
+The most popular distance measures are:
+\begin{itemize}
+    \item Euclidean distance: The root of the sum of squared differences of the components of the feature vectors. Performs well on features of similar type e.g. height, width, weight.
+    \item Manhattan distance: Sum of the absolute differences of the components of the feature vectors. Performs well on heterogenous features like age, sex, hair color.
+\end{itemize}
+
+\subsection*{Aggregation of Target Values}
+Once the K nearest neighbors of a new data point have been found, their target variables have to be aggregated. For regression problems it is typical to take the mean or median. For classification problems it is typical to take the class which the majority of the neighbors have.
