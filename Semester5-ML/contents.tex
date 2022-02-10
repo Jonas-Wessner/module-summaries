@@ -346,6 +346,7 @@ The algorithm works as follows:
 \end{enumerate}
 
 \section{Gradient Descent}
+\label{sec:gradient_descent}
 
 Gradient descent describes the method of minimizing a cost function of a ML algorithm. We have a given machine learning algorithm and a cost function e.g. the root of squared residuals. In (normal/ batch) gradient descent we would first randomly initialize all parameters in the ML model. Then we would make predictions for all training samples and calculate the loss function of the desired output and the real output. Then we would update all parameters against the gradient of the cost function effectively lowering the gradient for the average sample. We would repeat that until the average value of the cost function on training samples converges.
 
@@ -397,15 +398,66 @@ Pooling layers can be used in ANNs to down sample the feature maps i.e. reduce t
     \item \textbf{Average polling layers} calculate the averyge value within the scope of the kernel.
 \end{itemize}
 
-\section{Logistic Regression and Cross Entropy}
 
-TODO: do this
+\section{Regression}
 
+\subsection{Linear Regression}
 
-\section{Linear Regression and Normal Equation}
+Logistic Regression means using a linear function $f(x_{1}, x_{2}, ... x_{n}) = w_{1}x_{1} + w_{1}x_{1} + ... + w_{n}x_{n} + w_{b} \cdot 1$ for the approximation of the mapping of inputs with $n$ features to a continuous target value. Initially all weights $w_{i}$ are randomly initialized and then iteratively changed towards minimizing a loss function using \hyperref[sec:gradient_descent]{gradient descent}. Therefore a single \hyperref[sec:mlp]{perceptron} is also a linear regressor where $x_{i}$ are its n inputs, $w_{i}$ the weights associated with the inputs and $w_{b}$ the impact of the bias unit.
 
-TODO: do this
+\subsection{Logistic Regression}
 
+Logistic Regression is a machine learning approach used for classification problems using linear regression. As the output of a classification is meant to be the value 0 or 1. Therefore the output of the linear regressor has to be transformed by another function which happens to be the \hyperref[sec:sec:fig:sigmoid]{sigmoid function} followed by a threshold function (mostly threshold at $0.5$). The sigmoid function first maps the values into the range from $0$ to $1$. The threshold is used to decide at what point we want to accept something as classified.\\
+
+A single logistic regressor can be used to solve binary classification problems.
+
+\subsection{Cross Entropy}
+
+Cross entropy is a value that can be used as a loss function (Cross Entropy Loss) to say how bad a prediction is. In the equation $p_{i}$ is the true probability of an event $i$, which in the case of figure \ref{fig:cross_entropy_loss} is 0 for all classes except \textit{red panda}. $q_{i}$ is the predicted probability for the event $i$.
+Therefore cross entropy is 0 if the prediction is perfect and increases with increasing difference of true probability and predicted probability.
+
+$$
+    H(p, q) = - \sum_{i=1}^{n} p_{i} \cdot log(q_{i})
+$$
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=500px]{cross_entropy_loss.png}
+    \caption{One-hot encoded predictions for a classification problem for one sample.}
+    \label{fig:cross_entropy_loss}
+\end{figure}
+
+\subsection{Normal Equation}
+
+Suppose we have $m$ Training examples $(\vec{x_{i}}, y_{i})$. All $\vec{x_{i}}$ have $n$ features and are therefore vectors with $n$ components. So we can also write the entire training dataset as a matrix $X$:
+
+$$
+    \begin{bmatrix}
+        \vec{x_{1}}^{T} \\
+        \vec{x_{2}}^{T} \\
+        \vec{...  }     \\
+        \vec{x_{m}}^{T} \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        x_{11} & x_{12} & ... & x_{1n} \\
+        x_{21} & x_{22} & ... & x_{2n} \\
+        ...    &        &     &        \\
+        x_{m1} & x_{m2} & ... & x_{mn} \\
+    \end{bmatrix}
+$$
+
+Now if we want to find out the relationship between the features of the training samples $X$ and the target values $\vec{y}$, we need to find a column vector $\vec{w}$ such that:
+
+$$
+    X \cdot \vec{y} = \vec{w}
+$$
+
+This can be directly solved as a linear system of equations. However, in machine learning this equation system will not have an exact solution, so we cannot directly solve it. Instead we try to find the best possible approximation i.e. the least incorrect solution $X \cdot \vec{w} \approx \vec{y}$ We define that our loss function in this case is the least sum of squared residuals. If we minimize the least sum of squares (setting the derivative to 0) and solve that for $\vec{w}$ we wend up with the following equation also called the \textit{normal equation}:
+
+$$
+    \vec{w} = (X^T X)^{-1} X^T \vec{y}
+$$
 
 \section{Decision Trees}
 
