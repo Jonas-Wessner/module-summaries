@@ -170,3 +170,65 @@ In figure \ref{fig:heap_containers_rust} a short summary of containers and types
     \caption{Use case for return value optimization in C++}
     \label{fig:heap_containers_rust}
 \end{figure}
+
+
+\section{Zero Overhead Abstractions}
+
+Zero Overhead abstractions are abstractions that have no performance overhead at runtime compared to the most optimal handwritten solution for the problem.
+
+\subsection{Product Types and Sum Types}
+
+Each primitive type has a finite set of possible values it can take on. However, we can define product types and sum types that build an abstraction on top of primitive types.\\
+Product types are types whose set of possible values is of the size of the product of the amount of possible values of all contained types, an example are structs or classes.\\
+Sum types are types whose size of the set of possible values is the sum of the amount of distinct values of all contained types, an example are rust enums.
+
+\subsection{Iterators}
+
+Iteration can be defined as a sequence of the following three operations:
+
+\begin{itemize}
+    \item Dereferencing: Get access to current element
+    \item Incrementing: Move to next element
+    \item Comparing: Check if we are at the end of collection
+\end{itemize}
+
+In Rust all these three properties are usable with only one method which is called \lstinline{next()}. It retrieves the current element if there is one, otherwise returns \lstinline{None} and increments the iterator.
+
+In contrast to C++, rust uses stateful iterators, which means that the iterator knows its current position inside a collection and will return \lstinline{None} once it has reached the end.
+
+\subsection{Algorithms}
+
+In the following we will summarize some of the useful algorithms that are supplied for working with rust iterators:
+
+\begin{enumerate}
+    \item \lstinline{all}: returns true if all elements meet a certain condition
+    \item \lstinline{any}: returns true if at least one element meets a certain condition
+    \item \lstinline{is_partitioned}: returns true if there is a boundary in the container such that all elements before the boundary are either true or false and after the boundary the oposite.
+    \item \lstinline{filter}: Returns an iterator over all elements that meet a given condition.
+    \item \lstinline{filter_map}: returns an iterator over all elements of Type U for which a filter closure returns Some(U)
+    \item \lstinline{position}: returns the Some(index) of the first element matching a condition
+    \item \lstinline{find}: returns Some(T) for the first element of type T matching a condition.
+    \item \lstinline{collect}: returns a collection storing all elements over which has been iterated
+    \item \lstinline{count}: Returns the number of elements over which is being iterated.
+    \item \lstinline{for_each}: calls a function without return value taking each element as an input.
+    \item \lstinline{max}: returns the maximum element
+    \item \lstinline{min}: returns the minimum element
+    \item \lstinline{fold}: takes a start value of Type U and a closure with 2 parameters T and U with return value U which will be called for each element. Returns a value of type U which is the result of calling the closure with the accumulated value and the current value of the iterator for each element.
+    \item \lstinline{reduce}: Combines two elements of type T to one repeating this for each element and returning the resulting scalar value T.
+    \item \lstinline{sum}: fold with start value 0 and an addition as closure.
+    \item \lstinline{product}: fold with start value 1 and multiplication as closure.
+    \item \lstinline{step(n)}: returns an element over every n-th element
+    \item \lstinline{peekable}: returns a peekable iterator which is an iterator which can call .peek() which means returning the current element without incrementing the position.
+    \item \lstinline{map}: converts each element of type T into an element of type U by calling a closure.
+    \item \lstinline{flatten}: converts an iterator over iterators (nested iterator) into an iterator over elements of the inner type (like flattening a 2d-array to a 1d array).
+    \item \lstinline{intersperse(val)}: returns an iterator over the elements separated by the given val.
+    \item \lstinline{cycle}: returns a never ending iterator that returns the elements of the given iterator in a cycle.
+    \item \lstinline{chain(other)}: concats iterators
+    \item \lstinline{enumerate}: returns an iterator over tuples of (index, element).
+    \item \lstinline{fuse}: returns an iterator that will always return None after having returned None once on calling \lstinline{next}.
+    \item \lstinline{rev}: returns an iterator over the elements in reversed order
+    \item \lstinline{zip(other)}: returns an iterator over tuples of the elements of both iterators.
+\end{enumerate}
+
+Note that rust iterators are online iterators, which means they work with one piece of data at a time and therefore do not support sorting, however collections in rust often have sort methods.
+
