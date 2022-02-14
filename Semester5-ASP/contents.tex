@@ -232,3 +232,28 @@ In the following we will summarize some of the useful algorithms that are suppli
 
 Note that rust iterators are online iterators, which means they work with one piece of data at a time and therefore do not support sorting, however collections in rust often have sort methods.
 
+\section{Error Handling}
+
+There are three common ways of error handling:
+
+\begin{itemize}
+    \item Error Codes like in C:
+          \begin{itemize}
+              \item[+] easy and not complicated
+              \item[-] abuse of return type makes certain values unusable for non-error cases
+              \item[-] easy to ignore errors returned by a function
+              \item[-] error codes have no names and must be transated using documentation
+              \item[-] specific error data must be read from global variables
+          \end{itemize}
+    \item Exceptions like in C++:
+          \begin{itemize}
+              \item[+] convenient for user as the function call is separated from the catch statement
+              \item[-] not transparent which function throws what errors
+          \end{itemize}
+    \item Result Type like in Rust:
+          \begin{itemize}
+              \item[+] error must be handled explicitly
+              \item[+] errors can deliver error details to the caller
+              \item[+] it is clear to the caller what error can be returned by e.g. using an enum as error type inside a result type.
+          \end{itemize}
+\end{itemize}
