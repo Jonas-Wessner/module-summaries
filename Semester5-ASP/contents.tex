@@ -65,3 +65,108 @@ Examples for application programming languages:
     \item Python
     \item Java
 \end{itemize}
+
+\section{Memory Management and Memory Safety}
+
+\subsection{Types of Memory}
+
+Mainly the following types of memory exist in a computer ordered from small space and fast access speed to large space and slow access speed:
+
+\begin{itemize}
+    \item CPU registers
+    \item Cache (L1, L2, L3)
+    \item RAM
+    \item SSD
+    \item HDD
+    \item Network Storage (Cloud, Backup)
+\end{itemize}
+
+\subsection{Locality}
+
+There are two principles of locality which are used by caching algorithms:\\
+\textbf{Spatial locality} assumes that after a certain portion of memory has been read, the next read memory addresses are  likely to be at a nearby memory address. This is true because of how e.g. arrays are designed and because of the fact that each process has an address space of consecutive memory addresses.
+\textbf{Temporal locality} assumes that after a certain memory location has been read it is likely that it is going to be read again in a relatively short time span. This is true because of how logic computer programs usually works. If we read something from a location we often want to write something from that location and read it again shortly after.
+
+\subsection{Virtual Memory}
+
+There are two types of memory addresses: physical addresses and virtual addresses. Physical addresses are the addresses of bytes in RAM. Virtual memory addresses are addresses that are mapped to physical addresses. The virtual memory address space is much larger than the physical address space (RAM size) which allows us to use more memory than actually available. The mapping between virtual and physical memory is stored in a data structure called page table. The reason for using pages instead of a byte to byte mapping is that the page table would be way to large if we did so. In practice pages are e.g. 4KiB on unix systems.\\
+Whenever the CPU executes a load or store instruction the virtual address first has to be resolved. in case the virtual address maps to a physical address in RAM the instruction can be executed right away. In case the virtual address is occupied but maps to a physical address on disc, which is called \textit{page fault}, the following things must happen:
+
+\begin{itemize}
+    \item An unused physical address must be found. If all physical addresses are occupied one page must be swaped out of RAM and stored on disc which is called \textit{page eviction}.
+    \item The contents of the desired virtual memory address must be copied to RAM and the page table must be updated.
+    \item The CPU instruction must be run again and will now not trigger a page fault.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=500px]{virtual_mem_1.png}
+    \caption{Visualization of virtual memory}
+    \label{fig:virtual_memory}
+\end{figure}
+
+A virtual address is split into two parts: the page number (yellow) and the offset within the page (orange). With an address like shown in figure \ref{fig:virtual_memory_address} we can therefore address $2^{4} = 16$ virtual pages of the size of $2^{12} bit= 2^{2} \cdot 2^{10} bit = 4 KiB$.
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=300px]{virtual_memory_address.png}
+            \caption{A single virtual address with page number in yellow and offset within page in orange}
+            \label{fig:virtual_memory_address}
+        \end{figure}
+
+        A page table entry as shown in figure \ref{fig:page_table_entry} must then map the virtual page number (VPN) to a physical page number (PPN). As physical and virtual pages are of the same size the virtual page offset (VPO) and the physical page offset (PPO) are identical and must not be mapped. When mapping a virtual to a physical address like shown in figure \ref{fig:virtual_address_mapping} therefore first the cached flag (yellow) is checked. If it is equal to zero a page fault has occurred and the physical address must first be loaded into RAM and then the page table must be updated. Now the physical address is build by replacing the virtual page number (VPN) with the physical page number (PPN) in the virtual address.
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=300px]{page_table_entry.png}
+            \caption{One page table entry with cached flag (yellow), virtual page number VPN (gray) and physical page number PPN (green)}
+            \label{fig:page_table_entry}
+        \end{figure}
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=500px]{virtual_address_mapping.png}
+            \caption{Visualization of the process of mapping a virtual address to a physical address}
+            \label{fig:virtual_address_mapping}
+        \end{figure}
+
+
+        \subsection{Return Value Optimization (RVO)}
+
+        A common thing to do in C++ is to return a local variable from a function and assign it to a local variable of the calling function like shown in figure \ref{fig:rvo}. In this example if we assume we return a stack variable from the function \lstinline{add()}. Then if we resolve function calls we would end up with a local variable on the stack of the \lstinline{add()} function wich is written to the register R0 as a return value. Then the return value is copied into the variable \lstinline{result} by the \lstinline{main()} function. To prevent this unnecessary copying of stack variables the compiler in C++ is allowed to apply \textit{return value optimization (RVO)} and alter the normal behavior of stack cleanup to avoid the copying.
+
+\begin{figure}[h]
+    \begin{lstlisting}
+        int main(){
+            int result = add(2, 2);
+        }
+    \end{lstlisting}
+    \caption{Use case for return value optimization in C++}
+    \label{fig:rvo}
+\end{figure}
+
+\subsection{Resource Acquisition is Initialization (RAII)}
+
+C++ introduced a term called RAII which stands for \textit{resource acquisition is initialization}. This refers to the behavior that if we use the \lstinline{new}-operator to allocate memory on the heap, we also automatically call a constructor which will initialize that memory for us. Also when freeing that memory location with the \lstinline{delete}-operator the destructor of the object is called to perform necessary cleanups. In pure C that was different as \lstinline{malloc} and \lstinline{free} do not initialize and cleanup their memory location. RAII is useful, can prevent frequent bugs and is of course also used in Rust.
+
+\subsection{Single Owner and Shared Owner Memory Management}
+
+In a single owner memory model like a \lstinline{vector} the object allocates memory once it is created and cleans it up once it goes out of scope. However with a shared memory management an object allocates the memory only if it is the first instance being created for a specific memory segment and only cleans up if it is the last object pointing to that memory segment. This behavior allows multiple owners of heap memory and prevents \textit{double free errors}. To be able to achieve this we need smart pointers with reference counting i.e. pointer types that check in their destructor if they are the last instance pointing to specific address.
+
+\subsection{Heap Containers in Rust}
+
+In figure \ref{fig:heap_containers_rust} a short summary of containers and types is shown to work with the heap in rust. Furthermore I would like to give some more details to the individual containers here:
+
+\begin{itemize}
+    \item \lstinline{Rc<T>}: is a reference counting pointer. Its construction allocates memory on the heap. Using clone creates another instance of \lstinline{Rc<T>} pointing to the same memory location. Once the last instance of \lstinline{Rc<T>} pointing to that location goes out of scope it triggers the Drop trait for \lstinline{T}.
+    \item \lstinline{Weak<T>}: is a pointer to a memory location which does not guarantee that memory location is still valid. It can be obtained via \lstinline{Rc::downgrade} and be converted to an \lstinline{Rc<T>} by calling \lstinline{upgrade}. When a \lstinline{Weak<T>} gets out of scope it never triggers the Drop Trait of \lstinline{T}. Also when all \lstinline{Rc<T>} pointing to one instance of T have been dropped \lstinline{Weak<T>}s to that location will return \lstinline{None} on \lstinline{upgrade} as they point to freed memory locations. \lstinline{Weak<T>} is useful to avoid circular dependencies between \lstinline{Rc}s.
+    \item \lstinline{Cell<T>}: allows multiple owners of the same data. However, when retrieving that value the value will be copied. Therefore if we retrieve the value mutably inside the \lstinline{Cell<T>} twice in the same scope, this is possible, but also results in two independent variables.
+    \item \lstinline{RefCell<T>}: allows multiple mutable owners of the same data. When retrieving a reference to the inner value it is checked that there is currently no other access to the inner value, otherwise the \lstinline{borrow_mut} function panics. This way the borrow checking rules are enforced at runtime. This means we will never have two mutable references to the same data at the same time, because we otherwise panic. The programmer must now make sure he will not get a panic. This is not thread safe.
+    \item \lstinline{Arc<T>}: is an atomic reference counting pointer. It can be used across threads in order to have multiple threads accessing the same data. However it requires the wrapped value to be Sync, which means it must also be thread safe to access that. This can be ensured by wrapping the inner value inside of a \lstinline{Mutex<T>} or a \lstinline{RwLock<T>}.
+\end{itemize}
+
+\begin{figure}[h]
+    \includegraphics[width=500px]{memory_cheat_sheet.png}
+    \caption{Use case for return value optimization in C++}
+    \label{fig:heap_containers_rust}
+\end{figure}
