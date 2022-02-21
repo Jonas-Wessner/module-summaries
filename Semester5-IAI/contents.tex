@@ -1,1 +1,136 @@
-\section{placeholder}
+\section{Machine Learning}
+
+\subsection{Definition}
+
+Machine learning is the approach of generating a model based on inputs (training) and using it for making predictions (productive application) instead of programming instructions explicitly. It is therefore a data-driven approach to finding solutions to problems.
+
+\subsection{Examples of ML tasks}
+
+\begin{itemize}
+    \item Spam Filter: Classify emails as spam and not spam
+    \item Stock market analysis: Make recommendations on buying or selling stocks
+    \item Loyal Customer Detection: Given Data about a customer, classify him/her as loyal or non-loyal customer for the future
+\end{itemize}
+
+\subsection{Categories of ML tasks}
+
+\begin{itemize}
+    \item Supervised Learning
+          \begin{itemize}
+              \item Classification
+              \item Regression
+          \end{itemize}
+    \item Unsupervised Learning
+          \begin{itemize}
+              \item Clustering
+              \item Feature selection
+              \item Feature extraction
+          \end{itemize}
+    \item Reinforcement Learning: Try and error mit nach Belohnungsprinzip
+\end{itemize}
+
+\subsubsection{Preprocession}
+
+\begin{itemize}
+    \item Extracting relevant columns $\rightarrow$
+          \begin{itemize}
+              \item Faster learning process
+              \item better results
+          \end{itemize}
+    \item Filling missing values
+          \begin{itemize}
+              \item Deleting rows with missing values
+              \item Mean
+              \item Median
+              \item Use Algorithm that supports missing values
+          \end{itemize}
+\end{itemize}
+
+\subsubsection{Error functions}
+
+\begin{itemize}
+    \item Mean absolute error (MAE)
+    \item Mean squared error (MSE)
+    \item Rooted MSE (RMSE)
+\end{itemize}
+
+\subsubsection{Metrics}
+
+\subsubsection*{Accuracy}
+
+Accuracy answers the question \quotes{\textit{What is the probability that a prediciton is correct?}}.
+
+$$
+    Acc = \frac{TP + TN}{TP + TN + FP + FN}
+$$
+
+It is only good, if the real distribution of positive and negatives in the data is close to symmetric.
+
+\subsubsection*{Precision}
+
+Precision answers the question \quotes{\textit{If we classify something as positive, how probable is it that it is actually positive?}}.
+
+$$
+    Precision = \frac{TP}{TP + FP}
+$$
+
+\subsubsection*{Recall}
+
+Recall a.k.a. sensitivity answers the question \quotes{\textit{If a sample is positive, what is the probability we also label it as positive?}}.
+
+$$
+    Recall = \frac{TP}{TP + FN}
+$$
+
+\subsubsection*{F1 Score}
+
+The F1-score divides the true positives by the sum of the true positives and the mean of the false positives and false negatives. This a high F1-score requires the model to make not few false predictions in either direction. Therefore F1-score is better than accuracy if the real distribution of positive and negative values in the dataset is uneven.
+
+$$
+    F1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall} = \frac{TP}{TP + \frac{1}{2} \cdot (FP + FN)}
+$$
+
+
+\subsection*{Validation}
+
+\subsubsection{K-fold cross validation}
+
+\begin{itemize}
+    \item split dataset into k subsets
+    \item Perform k trainings on k-1 subsets and use the one remaining set for validation such that each subset has been used for validation exactly once
+    \item calculate the mean of all k iterations
+\end{itemize}
+
+\section{Knowledge Representation}
+
+\subsection{Knowledge Graphs}
+
+A knowledge graph a.k.a. semantic net or ontology is a data structure linking different entities to each other. A common type of knowledge graph is one that consists of triples [subject, predicate, object].\\
+Linked Open Data (LOD) refers to all publicly available data in the internet that can be found using URIs and HTTP.\\
+RDF (Resource Description Framework) is a system for describing such data in nets of triples. SPARQL is a query language that can be used to retrieve data from a database which is using the RDF format.\\
+A popular free SPARQL server is Apache Jena Fuseki.\\
+
+In the following we can see how to extract tuples (name, country) of city names and country names for which the city is the capital of the country and the country is located in Africa. \lstinline{es} is the prefix for all classes used in this example. \lstinline{cityname}, \lstinline{isCapitalOf}, \lstinline{country} and \lstinline{isInContinent} are classes of predicates. All identifiers starting with a question mark are variables.\\
+
+
+\begin{lstlisting}[language=SPARQL]
+PREFIX ex: <http://example.com/exampleOntology#>
+SELECT ?capital
+       ?country
+WHERE
+  {
+    # match every city here, assign them to variable ?x and
+    # their name and the countries it is a capital for to
+    # variables ?capital and ?y
+    ?x  ex:cityname       ?capital   ;
+        ex:isCapitalOf    ?y         .
+    # For all those countries which have capitals,
+    # filter those who are in located in Africa and  extract their names
+    ?y  ex:countryname    ?country   ;
+        ex:isInContinent  ex:Africa  .
+  }
+\end{lstlisting}
+
+
+\section{Natural Language Processing (NLP)}
+
