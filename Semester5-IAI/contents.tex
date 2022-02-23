@@ -109,7 +109,14 @@ $$
 
 \subsection{Knowledge Graphs}
 
-A knowledge graph a.k.a. semantic net or ontology is a data structure linking different entities to each other. A common type of knowledge graph is one that consists of triples [subject, predicate, object].\\
+A knowledge graph a.k.a. semantic net or ontology is a data structure linking different entities to each other. A common type of knowledge graph is one that consists of triples:
+
+\begin{itemize}
+    \item subject: resource
+    \item predicate: resource
+    \item object: resource or value (string, int, ...)
+\end{itemize}
+
 Linked Open Data (LOD) refers to all publicly available data in the internet that can be found using URIs and HTTP.\\
 RDF (Resource Description Framework) is a system for describing such data in nets of triples. SPARQL is a query language that can be used to retrieve data from a database which is using the RDF format.\\
 A popular free SPARQL server is Apache Jena Fuseki.\\
@@ -130,11 +137,30 @@ WHERE
         ex:isCapitalOf    ?y         .
     # For all those countries which have capitals,
     # filter those who are in located in Africa and  extract their names
+    # concrete values as objects restrict the result set -> conditions
     ?y  ex:countryname    ?country   ;
-        ex:isInContinent  ex:Africa  .
+        ex:isInContinent  ex:Africa  . 
   }
 \end{lstlisting}
 
+
+
+
+\subsection{TMDB - The movie database}
+
+Popular collaborative database of movies with the following entities:
+
+\begin{itemize}
+    \item Movie
+    \item Country
+    \item Company
+    \item Genre
+    \item Collection
+    \item Keyword
+    \item Cast
+    \item Crew
+    \item Language
+\end{itemize}
 
 \section{Natural Language Processing (NLP)}
 
@@ -168,6 +194,26 @@ WHERE
 
 \subsubsection*{A simple idea for implementing Question Answering with SpaCy:}
 If we already have a database with questions and their answers we can answer new questions by returning the answer to the most similar question in our database.
+
+\subsection{Bag-Of-Words}
+
+Bag of words is a dictionary mapping each unique word to the number of occurrences. This dictionary can be used as an input for ML models.
+
+Advantages: simplicity\\
+Disadvantages: no information about grammar and relation of words, too high focus on stop words, big vector if many words are used which might be too small for supervised ML
+
+\subsection{tf-idf}
+Term frequency - inverse document frequency\\
+$$
+    \frac{occurence count of word}{average occurence count of word in general}
+$$
+
+The result is that stop words are only taken into account if they appear more often then usual.
+
+\subsection{n-gram model}
+
+Using n-gram model with n=1 is equal to using the bag-of-words model. N-gram groups n words together in an overlapping fashion. This way we hope to extract some grammar information and relation between words from the text. However this also increases the size of of the input vectors for ML models
+
 
 
 
@@ -323,6 +369,15 @@ Specifies the common structure for event objects such as their attributes and da
 
 A sliding window is a method for repeatedly capturing sequences of information from an event data stream from the near past. We define a window with duration/size $n$ (captures all data in the last $n$ seconds) and a windowing frequency $m$ (captures the last $n$ seconds every $m$ seconds).
 
+\subsection{Types of CEP rules}
+
+\begin{itemize}
+    \item \textbf{Filtering:} Using reg ex
+    \item \textbf{Pattern matching:} Detecting successions of events e.g. [sign up].next([use sign up discount code]).next([buy]).next([cancel account]). May be used for the generation of the event: [sneaky customer]
+    \item \textbf{Value progression analysis:} Using e.g. sliding window to detect changes in values over time. E.g. a drop of 100km/h of a car in 5 seconds might detect a [car crash] event.
+    \item \textbf{Time Progression analysis:} The time span in which event data is read is analysed as opposed to their values. E.g. if we do not get a heart break signal for over 1 minute we raise the event [just passed by :(]
+    \item \textbf{Semantic Enrichment / Iterative CEP:} Applying rules for CEP from low level to high level can lead to extracting semantic information in form of higher level events.
+\end{itemize}
 
 \subsection{CEP Technology}
 
