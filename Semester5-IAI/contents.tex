@@ -1,3 +1,7 @@
+\section{Regions of AI:}
+
+\includegraphics[width=500px]{regrions_of_AI.png}
+
 \section{Machine Learning}
 
 \subsection{Definition}
@@ -144,4 +148,87 @@ WHERE
     \item \textbf{Machine Translation:} translating a text into a different language
     \item \textbf{Text Generation:} Generate natural language texts e.g. answers to natural language questions for a voice assistant.
 \end{itemize}
+
+\subsection{SpaCy - NLP library}
+
+\begin{itemize}
+    \item \textbf{Tokenization:} Segmenting a text into single words punctuation marks etc.
+    \item \textbf{Part-of-speech (POS) tagging:} Assigning word types to tokens like verb, noun, adjective...
+    \item \textbf{Dependency Parsing:} Assigning dependency syntactic labels describing the relations between tokens e.g. subject, object, predicate
+    \item \textbf{Lemmatization:} Finding the base form of words e.g. drives $rightarrow$ drive
+    \item \textbf{Sentence Boundary Detection (SBD):} Splitting text by sentences. This is not Trivial as full stops can also appear mid-sentence e.g. when writing acronyms.
+    \item \textbf{Named Entity Recognition (NER):} Labelling real world objects like persons, companies or locations
+    \item \textbf{Entity Linking (EL):} Linking tokens or groups of tokens in a text to unambiguous entries in a knowledge base e.g. a knowledge graph.
+    \item \textbf{Similarity:} Calculating similarity of words or text spans
+    \item \textbf{Classification:} Assigning categories or labels to a whole document or parts of a document
+    \item \textbf{Rule-based Matching:} Finding sequences of tokens based on their linguistic annotations similar to regular expressions.
+    \item \textbf{Training:} Updating and improving a statistical model's prediction
+    \item \textbf{Serialization:} Saving objects to files or byte strings
+\end{itemize}
+
+\subsubsection*{A simple idea for implementing Question Answering with SpaCy:}
+If we already have a database with questions and their answers we can answer new questions by returning the answer to the most similar question in our database.
+
+
+
+\section{Computer Vision}
+
+\subsection{Common Types of Applications}
+
+\begin{itemize}
+    \item \textbf{Optical Character Recognition (OCR):}
+          \\Input: Image of handwritten or typewritten text.\\
+          Output: Text Document
+          \begin{itemize}
+              \item Digitalization of documents
+              \item Scanning addresses on letters
+              \item Evaluating forms
+          \end{itemize}
+    \item \textbf{Face Recognition:}\\
+          Input: Image\\
+          Output: Information about face: position and maybe building on top of that further information in form of classification
+          \begin{itemize}
+              \item Autotagging camera images
+              \item Image search
+              \item Detecting people on security cameras
+          \end{itemize}
+    \item \textbf{Medical Applications:} Detecting anomalies in CT/ MRI / Ultrasound images
+    \item \textbf{Industrial / Agricultural Applications:}
+          \begin{itemize}
+              \item Sorting fruits in agriculture
+              \item Quality management
+              \item Automation of manufacturing process using robots with computer vision technologies
+          \end{itemize}
+    \item \textbf{Military Applications:}
+          \begin{itemize}
+              \item Detection of enemies
+              \item Missile guidance
+              \item Autonomous drones and vehicles
+          \end{itemize}
+    \item \textbf{Automotive Applications:}
+          \begin{itemize}
+              \item Collision warning
+              \item Parking aid
+              \item Road sign detection
+              \item Autonomous driving
+          \end{itemize}
+    \item \textbf{Cinema:}
+          \begin{itemize}
+              \item Motion Capturing: translating real world motion into the motions of animated movie characters
+          \end{itemize}
+\end{itemize}
+
+\section{AI application development}
+
+\includegraphics[width=400px]{AI_application_dev.png}
+
+In the following we will list some common tools for application development:
+
+\begin{itemize}
+    \item \textbf{Flask:} Micro web framework written in Python.
+    \item \textbf{Jinja:} Web template engine for Python. Similar to Django but provides Python-like expressions while ensuring that templates are evaluated in a sandbox. In essence it evaluates HTML with embedded Python.
+    \item \textbf{Bootstrap:} CSS-Framework mit SCC und HTML Gestaltungsvorlagen, die durch anhängen von Tags and das HTML des Benutzers verwendet werden können.
+\end{itemize}
+
+\section{Ethical Aspects of AI}
 
