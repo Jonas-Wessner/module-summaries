@@ -272,3 +272,70 @@ Examples are:
     \item Choosing employees for a company based on features of the applicants
     \item High frequency trading
 \end{itemize}
+
+
+\section{CEP - Complex Event Processing}
+
+Complex Event Processing ist ein Themengebiet der Informatik, das sich mit der Erkennung, Analyse und Verarbeitung voneinander abhängiger Ereignisse beschäftigt.
+
+\subsection{CEP Application Examples}
+
+\begin{itemize}
+    \item \textbf{Fraud Detection:}\\
+          Input: Stream of Credit Card Transactions\\
+          Output: Fraud alert triggering a human interview
+    \item \textbf{Predictive Maintenance:}\\
+          Input: Stream of Sensor inputs from machinery in factory\\
+          Analysis: Check for patterns that indicate deterioration of machine e.g. vibration\\
+          Output: Warning triggering soon replacement of the machine part
+    \item \textbf{Logistics:}\\
+          Input: Stream of RFID signals\\
+          Analysis: Check for conditions that require certain actions\\
+          Output: Trigger actions such as inform logistic partners, inform customers about delivery, alert
+    \item \textbf{Stock Market Trading:}\\
+          Input: Stream of stock market data\\
+          Output: Sell or buy decision
+\end{itemize}
+
+\subsection{Terminology}
+
+\subsubsection*{Definition CEP}
+
+Processing streams of event data and deriving conclusions from them.
+
+\subsubsection*{Definition Event}
+
+Something notable that happens in real life.
+
+\subsubsection*{Definition Event Object}
+
+A data record representing a single event.
+
+\subsubsection*{Event Type}
+
+Specifies the common structure for event objects such as their attributes and data types. Therefore it is a class and event objects are instances of it.
+
+\subsubsection*{DBMS vs CEP}
+
+\includegraphics[width=500px]{dbms_vs_cep.png}
+
+\subsection{Sliding Window}
+
+A sliding window is a method for repeatedly capturing sequences of information from an event data stream from the near past. We define a window with duration/size $n$ (captures all data in the last $n$ seconds) and a windowing frequency $m$ (captures the last $n$ seconds every $m$ seconds).
+
+
+\subsection{CEP Technology}
+
+\begin{itemize}
+    \item Apache Kafka
+    \item Apache Flink
+    \item Apache Spark
+    \item Drools Fusion
+    \item MS Azure Stream Analytics
+    \item Oracle Stream Analytics
+    \item SAG Apama
+    \item SAP ESP
+    \item TIBCO
+    \item IBM WebSphere Business Events
+\end{itemize}
+
