@@ -1,19 +1,34 @@
 %*******************************************************
 % Acronyms
 %*******************************************************
-\automark[section]{chapter}
-\renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{#1}}{\spacedlowsmallcaps{#1}}}
+% \automark[section]{chapter}
+% \renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{#1}}{\spacedlowsmallcaps{#1}}}
 \renewcommand{\sectionmark}[1]{\markright{\thesection\enspace\spacedlowsmallcaps{#1}}}
 \refstepcounter{dummy}
 \pdfbookmark[0]{Abk\"{u}rzungsverzeichnis}{abkuerzungsverzeichnis}
 \markboth{\spacedlowsmallcaps{Abk\"{u}rzungsverzeichnis}}{\spacedlowsmallcaps{Abk\"{u}rzungsverzeichnis}}
-\chapter*{Abk\"{u}rzungsverzeichnis}
+% \chapter*{Abk\"{u}rzungsverzeichnis}
+\section*{List of Abbreviations}
 
 % Insert your acronyms here
 \begin{acronym}[UML]
-  \acro{DRY}{Don't Repeat Yourself}
-  \acro{API}{Application Programming Interface}
-  \acro{UML}{Unified Modeling Language}
+  \acro{MAC}{Medium Acess Control}
+  \acro{IP}{Internet Protocol}
+  \acro{HTTP}{Hypertext Transfer Protocol}
+  \acro{SSH}{Secure Socket Shell}
+  \acro{DNS}{Domain Name System}
+  \acro{DHCP}{Dynamic Host Configuration Protocol}
+  \acro{NTP}{Network Time Protocol}
+  \acro{NAT}{Network Adress Translation}
+  \acro{RTT}{Round Trip Time}
+  \acro{POP3}{Post Office Protocol version 3}
+  \acro{IMAP}{Internet Message Acess Protocol}
+  \acro{SMTP}{Simple Mail Transfer Prtocol}
+  \acro{SSL}{Secure Sockets Layer}
+  \acro{TLS}{Transport Layer Security}
+  \acro{PPP}{Point to Point Protocol}
+  \acro{UDP}{User Datagram Protocol}
+  \acro{TCP}{Transmission Control Protocol}
 \end{acronym}
 
 \cleardoublepage
