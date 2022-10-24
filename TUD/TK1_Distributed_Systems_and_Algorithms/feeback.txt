@@ -1,0 +1,37 @@
+========================
+
+1 Abstract
+Aktuelle Optimierungsframeworks nicht skalierbar ==> belegen
+nicht fehlertolerant ==> belegen
+Geneva faellt etwas vom Himmel nachdem vorher alles allgemein gehalten war
+==> Abstract wuerde ich nochmal uebedenken
+
+2.1 Motivation
+QCD: mit ML abgestimmt ?
+
+2.2 Ziel
+System entwickelt ==> das klingt, als ob Sie das Framework neu bauen
+Sie tragen ja eher dazu bei, dass ein schon skalierbares und fehlertolerantes System noch besser wird.
+
+2.3 Forschung
+DISROPT klingt interessant
+PAGMO:Ergebnis nicht identisch ==> nachweisen ?
+
+==> Am weitesten entwickelt und am besten getestet ==> siehe Abrbeit von Jan Knedlik. Der hat das etwas anders gesehen
+und sieht die groessere User-Community eher bei PAGMO
+==> das sagst Du sogar selbst, wie kann Geneva dann besser getestet sein ?
+
+==> Du solltest auch noch das Julia-Framework BAT.jl erwaehnen
+
+3 Ansatz
+multithreaded Server ==> ist das Dein Werk oder das von Ruediger ?
+
+4 Theorie
+Ausfuehren des Optmierungsalgorithmus ==> im Gegesatz zur Evaluisierungsfunktion, die Teil des User-Codes ist, der zu optimieren ist
+
+5 Methode
+und die Tauglichkeit auf Benutzung im HPC-Umfeld unter Verwendung realer Probleme aus der Physik zu untersuchen
+
+6 Gliederung
+5b ==> stark verbesserte Skalierbarkeit
+=====================================
