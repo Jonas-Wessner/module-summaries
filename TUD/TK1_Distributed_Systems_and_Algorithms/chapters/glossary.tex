@@ -1,15 +1,15 @@
-\section{Glossary}
+\chapter{Glossary}
 
 In this chapter, basic terms will be defined and explained.
 
-\subsection{Massively Parallel Programming}
+\section{Massively Parallel Programming}
 
 \acf{MPP} is a programming model which makes enormous use of multithreading and therefore of multi-core parallelization. As opposed to in distributed systems, in \ac{MPP} all processes or threads share common main memory, such that messages/information travel almost instantaneously from one execution thread to another. Also, communication is much less error-prone, because it is done in main memory as opposed to via a network.
 
-\subsection{Computer Network}
+\section{Computer Network}
 
 A \ac{CN} is a set of \acp{AS} connected by a \ac{CSS}. Here an \ac{AS} is not an \ac{AS} in the sense of autonomous computer networks, but instead a single node of a computer network i.e. some CPU with some memory.
 
-\subsection{Reliability}
+\section{Reliability}
 
 Reliability in the context of \ac{IPC} is the conjunctive presence of validity and integrity. Validity means that all messages in a sending process's outgoing buffer will be delivered to the receiving process's incoming buffer at some point in time. Integrity means that any message received is identical to the sent message, meaning no things like bit flips happened during transmission. Reliability is provided by the \ac{TCP}. However, when using \ac{TCP}, messages are not received as they have been sent due to the byte stream semantics. So depending on how tight one looks at the definition of integrity, \ac{TCP} might not fully provide integrity.
