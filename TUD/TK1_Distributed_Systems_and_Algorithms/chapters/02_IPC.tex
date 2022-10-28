@@ -1,0 +1,65 @@
+TODO: clean this up (lecture slides 27.10.22)
+TODO: create chapters, like done in the lecture slides
+
+\chapter{Interprocess Communication}
+
+\ac{IPC} can be split into three types, which will be explained in more detail in the following.
+
+\subsection{Shared Memory}
+
+NOTES:
+Implicit communication about shared memory.
+Synchronization using locks
+Widespread in OS and MPP
+DIfficult in DistSystems, where no shared memory exists -> emulate it if required
+
+Less relevant for this lecture
+
+\subsection{Message Passing}
+
+- Explicit communication through messages
+- synchronization through blocking receive and send operations
+- exactly what happens in distSyst, because we send messages over the transport layer
+
+TCP Sockets usage:
+connection cycle: (insert a picture from slide 15)
+Server: socket (creates port association for accepting multiple remote connections) -> bind -> listen -> accept -> read/write -> close
+Client: socket(create port association) -> connect -> write/read -> close
+- stream semantics
+- Server has many incoming connections on the same port. Therefore it must distinguish between the incoming connections. Therefore, one listener socket is used and then another transmission socket is created for each connected client. This way we then can read and write from different distinct sockets and also close them independently. This is somewhat a dirty pattern, however, it is the currently used pattern.
+
+UDP socket usage:
+Server: create socket -> loop{receive} -> close
+Client: create socket -> send to address+port -> end or send new message.
+- no connection
+- integrity: somehow yes. UDP will throw errors based on checksum, but not correct the error or resubmit the message
+- validity not provided
+- -> reliability not provided
+- UPD is the basis for sophisticated transport protocols, which might be better than TCP for some use cases.
+- message semantics, not stream semantics
+
+### Other transport layers than UPD and TCP of today's age:
+- TCP is still by far the most common one
+- e.g. QUIC is another very fast transport layer protocol
+- IEFT Working Group TAPS works on a generic interface to transport layer. Such that programmers can use any transport protocol without changing their program code (accept maybe one variable determining the protocol)
+
+
+#### SCTP (slide 25)
+#### DCCP (slide 26)
+- separate header and data checksum -> if only data checksum is corrupted. Therefore, we can error handle it depending on the intact header. Otherwise (like in TCP) we must just throw corrupted packets away because e.g. the sequence number might not be correct.
+#### QUIC
+- implemented in chrome, chromium and some other apps
+- Contrary to other proposed protocols, this sees more acceptance due to Google's big influence.
+- less overhead on connection establishment (fewer handshake messages)
+- Is faster, because linking directly into TSL
+- Intertwines with HTTP2
+- On the contrary, if TSL or HTTP should be replaced, QUIC breaks, because it breaks the rules of layer separation.
+
+
+
+\subsection{Message Queues}
+
+\section{Distributed Programming Languages}
+
+- not accepted in the past, maybe coming up in the future
+- \ac{DRTS}

@@ -1,13 +1,13 @@
-\section{Introduction to Distributed Systems}
+\chapter{Introduction to Distributed Systems}
 
 %##################################################
-\subsection{Definition of a Distributed System}
+\section{Definition of a Distributed System}
 %##################################################
 
 A distributed system is a \ac{CN} providing some kind of abstraction/transparency provided by the transport layer and potentially by some kind of middleware. Distributed systems are looked at from the application layer of the TCP/IP model.
 
 %##################################################
-\subsection{Challenges}
+\section{Challenges}
 %##################################################
 
 There are three basic challenges, which together form the \textit{bermuda triangle} of distributed systems:
@@ -19,7 +19,7 @@ There are three basic challenges, which together form the \textit{bermuda triang
 \end{enumerate}
 
 %##################################################
-\subsection{Requirements}
+\section{Requirements}
 %##################################################
 
 We would like to require distributed systems to have certain properties. These properties differ from book to book, but we will define the following seven properties for this lecture:
@@ -35,7 +35,7 @@ We would like to require distributed systems to have certain properties. These p
 \end{enumerate}
 
 %##################################################
-\subsection{Abstraction Levels}
+\section{Abstraction Levels}
 %##################################################
 
 There are several abstraction layers, from which we can look at distributed systems. In the following, we divide into 4 levels, which are ordered ascending by their level of abstraction. When talking about distributed systems, we would like to be at level 3 or 4.
@@ -48,7 +48,7 @@ There are several abstraction layers, from which we can look at distributed syst
 \end{enumerate}
 
 %##################################################
-\subsection{Transparency}
+\section{Transparency}
 %##################################################
 
 We would like distributed systems to provide transparency concerning certain properties. Transparency here means the concealment of the property. The properties are:
@@ -65,7 +65,7 @@ We would like distributed systems to provide transparency concerning certain pro
 \end{enumerate}
 
 %##################################################
-\subsection{Classification}
+\section{Classification}
 %##################################################
 
 According to Flynn's taxonomy, distributed systems can be classified as the \ac{MIMD} model.
@@ -80,7 +80,7 @@ Furthermore, they can be classified based on their distributed property. In prac
 \end{enumerate}
 
 %##################################################
-\subsection{Tier Architectures}
+\section{Tier Architectures}
 %##################################################
 
 Applications can be distributed into multiple layers, which then result in Tier-architectures:
@@ -92,7 +92,7 @@ Applications can be distributed into multiple layers, which then result in Tier-
 \end{enumerate}
 
 %##################################################
-\subsection{Fundamental Approaches}
+\section{Fundamental Approaches}
 %##################################################
 
 There are 4 fundamental approaches for writing distributed software. The most widespread approach, which is also a topic of this lecture, is the distributed programming approach:
@@ -110,7 +110,7 @@ There are 4 fundamental approaches for writing distributed software. The most wi
 \end{enumerate}
 
 %##################################################
-\subsection{System Models}
+\section{System Models}
 %##################################################
 
 Distributed Systems can be classified based on their system model:
@@ -121,7 +121,7 @@ Distributed Systems can be classified based on their system model:
 \end{enumerate}
 
 %##################################################
-\subsection{Distributed Programming Paradigms}
+\section{Distributed Programming Paradigms}
 %##################################################
 
 In figure \ref{fig:programming_paradigms} we see a taxonomy for distributed programming paradigms. We can structure them into pull- and push-paradigms.

@@ -36,7 +36,7 @@
                 footinclude=true,cleardoublepage=empty,abstractoff, % <--- obsolete, remove (todo)
                 BCOR=5mm,paper=a4,fontsize=11pt,%11pt,a4paper,%
                 ngerman,american,%lockflag%
-                ]{scrartcl} % document class changed to remove chapters. This is better for such a small document
+                ]{scrreprt} % change document class to scrartcl to remove chapters
 
 \usepackage{enumitem} % customize items of enumerate
 
@@ -96,8 +96,9 @@
 % \cleardoublepage
 % \part{Thesis}\label{pt:thesis}
 
-\input{sections/01_intro.tex}
-\input{sections/glossary.tex}
+\input{chapters/01_intro.tex}
+\input{chapters/02_IPC.tex}
+\input{chapters/glossary.tex}
 
 %*************************************************************************
 % Recommendations
