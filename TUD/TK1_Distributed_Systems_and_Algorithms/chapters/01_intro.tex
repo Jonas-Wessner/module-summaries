@@ -30,7 +30,7 @@ We would like to require distributed systems to have certain properties. These p
     \item \textbf{Scalability:} Scalability concerning processors, memory, storage, and nodes.
     \item \textbf{Security:} Secure the network, because malicious users may try to compromise it.
     \item \textbf{Fault Tolerance:} We would like to be resilient to node (\ac{AS}) and network (\ac{CSS}) failures.
-    \item \textbf{Concurrency:} Distributed Networks are inherently concurrent. We of course want to take advantage of this property. However, then we need to ensure consistency e.g. when concurrently accessing shared resources.
+    \item \textbf{Concurrency:} Distributed Systems are inherently concurrent. We of course want to take advantage of this property. However, then we need to ensure consistency e.g. when concurrently accessing shared resources.
     \item \textbf{Transparency:} We would like to abstract from different properties of the \ac{CN}
 \end{enumerate}
 
@@ -105,7 +105,7 @@ There are 4 fundamental approaches for writing distributed software. The most wi
           \begin{itemize}
               \item[$0$] The zero-support approach builds distributed programs on top of the transport layer using UDP or TCP directly.
               \item[\textbf{M}] The middleware approach uses a middleware to abstract from the transport layer. This is today's approach.
-              \item[\textbf{D}] The distributed runtime system approach uses a parallel programming language and a distributed runtime. This results in compiler support for distributed programming. However, this is hard to realize and has seen no acceptance in the past 50 years. Maybe it could be the way to go in the future.
+              \item[\textbf{D}] The distributed programming language and runtime system approach uses a parallel programming language and a distributed runtime. This results in compiler support for distributed programming. However, this is hard to realize and has seen no acceptance in the past 50 years. Maybe it could be the way to go in the future.
           \end{itemize}
 \end{enumerate}
 
