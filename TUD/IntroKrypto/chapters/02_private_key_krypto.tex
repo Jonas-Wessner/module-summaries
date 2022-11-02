@@ -2,3 +2,21 @@
 
 \section{One Time Pad}
 
+The One Time Pad works as follows:
+
+\begin{enumerate}
+    \item Alice has a message $m \in \{0,1\}^n$ to be sent to Bob. Furthermore, Alice and Bob possess a common key $k \in \{0,1\}^n, n\in N$. $n$ is called the security parameter.
+    \item Alice computes a cipher text $c \in \{0,1\}^{n}$ as $c = m \oplus k$ and sends it to Bob.
+    \item Bob reconstructs the plain message as $m = c \oplus k = m \oplus k \oplus k = m \oplus \{0\}^{n}$.
+\end{enumerate}
+
+Therefore, the abstract object for this cryptographic process consists of the following functions\footnote{The symbol $\perp$ is indicating an error.}:
+
+\begin{itemize}
+    \item $kGen(1^{n}) \rightarrow k \in \{0,1\}^{n}$
+    \item $enc(m, k) -> \rightarrow c, \quad |m| = |k| = |c| = n$
+    \item $dec(c, k) -> \rightarrow m \quad || \quad \perp$
+\end{itemize}
+
+The functional correctness is then defined as follows:\\
+For all security parameter $n \in N$, for all messages $m$, for all keys $k \leftarrow kGen(1^{n})$, for all keys $k \leftarrow kGen(m,k)$ and for all ciphertexts $c \leftarrow enc(m,k)$ applies $dec(c,k) = m$. That means that we must be able to decrypt all encrypted messages for all possible input parameters.
