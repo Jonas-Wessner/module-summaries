@@ -113,65 +113,17 @@ Although distributed programming is of high interest, distributed programming la
 \section{Message Queues}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Message queues provide asynchronous persistent communication through a middleware. A message queue is an (optionally persistent) buffer at communication servers \textendash{} the so-called brokers. A powerful feature that is provided by message queues is that the sender and receiver must not be present at the same time as long as the message broker is online. For example, a sensor can send something to a queue and it might be picked up by another node later in time.
 
+The communicating processes have access to the following primitive operations to work with the message queue:
 
-% \ac{IPC} can be split into three types, which will be explained in more detail in the following.
+\begin{itemize}
+    \item \textbf{Put:} Upload a message to a specific queue.
+    \item \textbf{Get:} Block until there is a message in a specific queue and retrieve it.
+    \item \textbf{Poll:} Check if a message is in a specific queue and, if there is one, retrieve it. This is a non-blocking operation.
+    \item \textbf{Notify:} Register a handler, which is called as soon as a message arrives in a specific queue.
+\end{itemize}
 
-% \section{Shared Memory}
+Specific implementations are for example \ac{AMQP} or MQTT. They, however, also have features of public subscribe models and, therefore, can be classified as message queuing communication as well as publish-subscribe communication.
 
-% NOTES:
-% Implicit communication about shared memory.
-% Synchronization using locks
-% Widespread in OS and MPP
-% DIfficult in DistSystems, where no shared memory exists -> emulate it if required
-
-% Less relevant for this lecture
-
-% \section{Message Passing}
-
-% - Explicit communication through messages
-% - synchronization through blocking receive and send operations
-% - exactly what happens in distSyst, because we send messages over the transport layer
-
-% TCP Sockets usage:
-% connection cycle: (insert a picture from slide 15)
-% Server: socket (creates port association for accepting multiple remote connections) -> bind -> listen -> accept -> read/write -> close
-% Client: socket(create port association) -> connect -> write/read -> close
-% - stream semantics
-% - Server has many incoming connections on the same port. Therefore it must distinguish between the incoming connections. Therefore, one listener socket is used and then another transmission socket is created for each connected client. This way we then can read and write from different distinct sockets and also close them independently. This is somewhat a dirty pattern, however, it is the currently used pattern.
-
-% UDP socket usage:
-% Server: create socket -> loop{receive} -> close
-% Client: create socket -> send to address+port -> end or send new message.
-% - no connection
-% - integrity: somehow yes. UDP will throw errors based on checksum, but not correct the error or resubmit the message
-% - validity not provided
-% - -> reliability not provided
-% - UPD is the basis for sophisticated transport protocols, which might be better than TCP for some use cases.
-% - message semantics, not stream semantics
-
-% ### Other transport layers than UPD and TCP of today's age:
-% - TCP is still by far the most common one
-% - e.g. QUIC is another very fast transport layer protocol
-% - IEFT Working Group TAPS works on a generic interface to transport layer. Such that programmers can use any transport protocol without changing their program code (accept maybe one variable determining the protocol)
-
-
-% #### SCTP (slide 25)
-% #### DCCP (slide 26)
-% - separate header and data checksum -> if only data checksum is corrupted. Therefore, we can error handle it depending on the intact header. Otherwise (like in TCP) we must just throw corrupted packets away because e.g. the sequence number might not be correct.
-% #### QUIC
-% - implemented in chrome, chromium and some other apps
-% - Contrary to other proposed protocols, this sees more acceptance due to Google's big influence.
-% - less overhead on connection establishment (fewer handshake messages)
-% - Is faster, because linking directly into TSL
-% - Intertwines with HTTP2
-% - On the contrary, if TSL or HTTP should be replaced, QUIC breaks, because it breaks the rules of layer separation.
-
-
-
-% \section{Message Queues}
-
-% \section{Distributed Programming Languages}
-
-% - not accepted in the past, maybe coming up in the future
-% - \ac{DRTS}
+\ac{AMQP}, as an example of an implementation of message queuing, is quite bloated and uses rather complicated terms and semantics: The components of the system (e.g. clients, broker, persistence layer) are called \textit{containers}, within which one or more \textit{nodes} must be created. A \textit{connection} is a bidirectional transport stream between containers. In order to get to a \textit{session}, two unidirectional \textit{channels} must be combined. The possible number of \textit{sessions} is limited to the number \textit{channels}. Nevertheless, \ac{AMQP} is a popular framework.
