@@ -1,3 +1,25 @@
 \chapter{Glossary}
 
 In this chapter, basic terms will be defined and explained.
+
+\section{Kerckhoffs's Principle}
+
+Security should not require the system, but merely the key to be secret.
+
+\section{Perfect Security}
+
+A cryptographic process is perfectly secure if for all messages in the set of possibles messages $m \in M$ and all possibly producible ciphertexts $c \in C | Pr[C=c] > 0$ the probability that $m$ occurs is equal no matter if the ciphertext is known or unknown: $Pr[M=m] = Pr[M=m | C=c]$. More simply put, this means that an attacker cannot gain any knowledge about the message when seeing its ciphertext regardless of the message's and the ciphertext's concrete values.
+
+\section{Conditional Probability}
+
+Conditional probability $Pr[A=a | B=b]$ is the probability that the event $a \in A$ occurs if it is already known that the event $b \in B$ occurs. It is calculated as $Pr[A=a | B=b] = \frac{Pr[A=a] \wedge Pr[B=b]]}{Pr[B=b]}$. An example is a probability rolling a 6-sided dice results in the number 6 if it is already known that the result is an even number: $Pr[is 6 | is even] = \frac{Pr[is 6] \wedge Pr[is even]}{is even} = \frac{\frac{1}{6}}{\frac{1}{2}} = \frac{1}{3}$.
+
+Perfect security can only be reached for processes with deterministic a decryption function if the key space is at least as big as the message space $|K| \geq |M|$. This is because then a given ciphtertext $c$ could be decrypted to $|K|$ different messages $m$ (determinism), which minimizes the search space for an attacker from $|M|$ possibilities to $|K|$ possibilities and therefore also decrease the attacker's uncertainty..
+
+\section{Hiding Message Length}
+
+Completely hiding the length of a message is impossible if the length of possible messages is unlimited. Hiding messages' lengths would require changing their length for transmission. The message length cannot be decreased because this would result in data loss. Therefore, messages would have to be increased up to the maximum message size to make all appear to have the same length. If the message size is unlimited, we cannot expand messages to that nonexisting limit.
+
+\section{Insecurity of Shift-Ciphers}
+
+Shift-ciphers, like Ceasar, are not perfectly secure, which can be shown by contraposition: If the possible messages are defined as $M={aa, ab}$, a shift cipher shifting each character by some number of characters in an alphabet would always create ciphertexts as follows $Dec(aa) \rightarrow c_{0}c{0}$ and $Dec(ab) \rightarrow c_{0}c_{1} \quad|\quad c_{0} \neq c_{1}$ Therefore, an attackers probability when seeing the ciphertexts to guess the correct message $m \in M$ is equal to $1$ and greater than the initial probability, which was $\frac{1}{2}$. A concrete example would be: $Pr[M=aa | C=c_{0}c_{0}] = 1 \neq Pr[M=aa] = \frac{1}{2}$. We see that limiting the set of possible messages can be a helpful method for contradictions of perfect correctness.

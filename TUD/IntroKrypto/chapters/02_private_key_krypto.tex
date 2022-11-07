@@ -14,9 +14,13 @@ Therefore, the abstract object for this cryptographic process consists of the fo
 
 \begin{itemize}
     \item $kGen(1^{n}) \rightarrow k \in \{0,1\}^{n}$
-    \item $enc(m, k) -> \rightarrow c, \quad |m| = |k| = |c| = n$
-    \item $dec(c, k) -> \rightarrow m \quad || \quad \perp$
+    \item $enc(m, k) \rightarrow c, \quad |m| = |k| = |c| = n$
+    \item $dec(c, k) \rightarrow m \quad || \quad \perp$
 \end{itemize}
 
 The functional correctness is then defined as follows:\\
 For all security parameter $n \in N$, for all messages $m$, for all keys $k \leftarrow kGen(1^{n})$, for all keys $k \leftarrow kGen(m,k)$ and for all ciphertexts $c \leftarrow enc(m,k)$ applies $dec(c,k) = m$. That means that we must be able to decrypt all encrypted messages for all possible input parameters.
+
+\subsection*{Security of Shannon's OTP}
+
+Independently of a bit $m_i$ in the message $m$, the OTP flips this bit with the probability of $\frac{1}{2}$ creating a distribution of ciphtertexts $c$ that is independent of the messages $m$. And because $m$ and $c$ are independent, it is intuitive that knowing $c$ cannot reveal anything about $m$. We can also prove this mathematically because the probability for two independent events to take place is the product of the individual probabilities: $Pr[M=m | C=c] = \frac{Pr[M=m \wedge C=c]}{Pr[C=c]} = \frac{Pr[M=m] \cdot Pr[C=c]}{Pr[C=c]} = Pr[M=m]$.
