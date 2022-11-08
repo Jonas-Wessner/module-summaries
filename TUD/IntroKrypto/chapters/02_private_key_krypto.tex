@@ -24,3 +24,37 @@ For all security parameter $n \in N$, for all messages $m$, for all keys $k \lef
 \subsection*{Security of Shannon's OTP}
 
 Independently of a bit $m_i$ in the message $m$, the OTP flips this bit with the probability of $\frac{1}{2}$ creating a distribution of ciphtertexts $c$ that is independent of the messages $m$. And because $m$ and $c$ are independent, it is intuitive that knowing $c$ cannot reveal anything about $m$. We can also prove this mathematically because the probability for two independent events to take place is the product of the individual probabilities: $Pr[M=m | C=c] = \frac{Pr[M=m \wedge C=c]}{Pr[C=c]} = \frac{Pr[M=m] \cdot Pr[C=c]}{Pr[C=c]} = Pr[M=m]$.
+
+
+\section{Practical security}
+
+In practice, perfect security is not feasible because this would mean that for transferring each message $m$ a key $k$ with at least the same length $|k| \geq |m|$ would have to be transferred (see definition of perfect security in section \ref{sec:gloss:perf_sec}). For this reason, we define a weakened security definition, which comes in two variants \textendash{} Concrete security and asymptotic security. In this course, we look at asymptotic security.
+
+\begin{tabular}{|p{0.47\linewidth}|p{0.47\linewidth}|}
+    \hline
+    \textbf{Concrete Security:}                                                                                                       & \textbf{Asymptotic Security}                                                                                                                                          \\
+    \hline
+    A process is $(t,\mathcal{E})$-secure if no attacker $A$ can break it with at most $t$ steps with a probability of $\mathcal{E}$. & A process is secure, if no efficient (polynomial limited by security parameter $n$) algorithm breaks it with non-negligible (less than $\frac{1}{poly}$) probability. \\
+    \hline
+\end{tabular}
+
+The relevant terms are defined as follows, where $n$ is the security parameter (e.g. key size):
+
+\begin{itemize}
+    \item \textit{Efficient Algorithm:} Algorithm with polynomial runtime with regard to $n$.
+    \item \textit{Non-negligible Probability:} An inversely polynomial probability ($\frac{1}{poly}$) with regard to $n$.
+    \item \textit{Negligible Probability:} Smaller than an inversely polynomial function (i.e. less than non-negligible) $\leq \frac{1}{poly}$. Mathematically speaking, a function $\mathcal{E} \coloneqq N \rightarrow R$ if there can be found a value $limit \in N$, such that for all polynomial functions $poly$ applies $\mathcal{E}(n) \leq \frac{1}{poly} \quad|\quad n \ge limit$. This means that, if the security parameter is high enough, its value is smaller than any polynomial function.
+\end{itemize}
+
+\subsection*{Examples for Negligibility of functions}
+
+\begin{itemize}
+    \item $\mathcal{E} = 2^{-n}$ is \textit{negligible} because exponential functions grow faster than polynomial functions.
+    \item $\mathcal{E} = n^{-5}$ is \textit{not negligible} because there are polynomials that have smaller values as n approaches infinity e.g. $n^{-6}$.
+    \item $\mathcal{E} = \begin{cases}
+                  2^{-n} & \text{if $n$ is even}   \\
+                  n^{-5} & \text{if $n$ is uneven}
+              \end{cases}$
+          is \textit{not negligible} because for some values (all uneven values) it behaves like a polynomial function, such that e.g. $n^{-6}$ would have greater values regardless of a chosen $limit$.
+    \item $\mathcal{E} = \frac{1}{8}$ is \textit{not negligible} because it does not approach zero and therefore there are many polynomial functions that are smaller than $\mathcal{E}$ for high $n$
+\end{itemize}

@@ -7,6 +7,7 @@ In this chapter, basic terms will be defined and explained.
 Security should not require the system, but merely the key to be secret.
 
 \section{Perfect Security}
+\label{sec:gloss:perf_sec}
 
 A cryptographic process is perfectly secure if for all messages in the set of possibles messages $m \in M$ and all possibly producible ciphertexts $c \in C \quad|\quad Pr[C=c] > 0$ the probability that $m$ occurs is equal no matter if the ciphertext is known or unknown: $Pr[M=m] = Pr[M=m | C=c]$. More simply put, this means that an attacker cannot gain any knowledge about the message when seeing its ciphertext regardless of the message's and the ciphertext's concrete values.
 
