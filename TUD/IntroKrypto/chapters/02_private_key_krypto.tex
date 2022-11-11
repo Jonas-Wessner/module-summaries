@@ -43,10 +43,10 @@ The relevant terms are defined as follows, where $n$ is the security parameter (
 \begin{itemize}
     \item \textit{Efficient Algorithm:} Algorithm with polynomial runtime with regard to $n$.
     \item \textit{Non-negligible Probability:} An inversely polynomial probability ($\frac{1}{poly}$) with regard to $n$.
-    \item \textit{Negligible Probability:} Smaller than an inversely polynomial function (i.e. less than non-negligible) $\leq \frac{1}{poly}$. Mathematically speaking, a function $\mathcal{E} \coloneqq N \rightarrow R$ if there can be found a value $limit \in N$, such that for all polynomial functions $poly$ applies $\mathcal{E}(n) \leq \frac{1}{poly} \quad|\quad n \ge limit$. This means that, if the security parameter is high enough, its value is smaller than any polynomial function.
+    \item \textit{Negligible Probability:} Smaller than an inversely polynomial function (i.e. less than non-negligible) $\leq \frac{1}{poly}$. Mathematically speaking, a function $\mathcal{E} \coloneqq N \rightarrow R$ if there can be found a value $limit \in N$, such that for all polynomial functions $poly$ applies $\mathcal{E}(n) \leq \frac{1}{poly} \quad|\quad n \ge limit$. This means that, if the security parameter is high enough, its value is smaller than any polynomial function. Stating that a function $\mathcal{E}$ is negligible can be written in three ways: $\mathcal{E} \leq neg(n)$, $\mathcal{E} = neg(n)$ or $\mathcal{E} \approx 0$. Furthermore, if a the function $\mathcal{E}_{1}$ and the function $\mathcal{E}_{2}$ differ by a negligible difference, we can write $\mathcal{E}_{1} \approx \mathcal{E}_{2}$.
 \end{itemize}
 
-\subsection*{Examples for Negligibility of functions}
+\subsection*{Examples for Negligibility of probability functions}
 
 \begin{itemize}
     \item $\mathcal{E} = 2^{-n}$ is \textit{negligible} because exponential functions grow faster than polynomial functions.
@@ -59,4 +59,82 @@ The relevant terms are defined as follows, where $n$ is the security parameter (
     \item $\mathcal{E} = \frac{1}{8}$ is \textit{not negligible} because it does not approach zero and therefore there are many polynomial functions that are smaller than $\mathcal{E}$ for high $n$
 \end{itemize}
 
-% TODO: continue in video 3 at 13:00
+\subsection*{Arithmetic Laws for Negligible Functions}
+
+If $mathcal{E}_{1}$ and $mathcal{E}_{2}$ are negligible functions $mathcal{E}_{1}, mathcal{E}_{2} \approx 0$ and $q$ is a polynomial function $q = poly$ and $\omega$ ia a non-negligible $\omega \not\approx 0$ function, then applies:
+
+\begin{align}
+    \mathcal{E}_{1}(n) + \mathcal{E}_{2}(n) & \approx 0     \label{eq:neglig_1}        \\
+    \mathcal{E}_{1}(n) \cdot q(n)           & \approx 0            \label{eq:neglig_2} \\
+    \omega(n) - \mathcal{E}_{1}(n)          & \not\approx 0 \label{eq:neglig_3}
+\end{align}
+
+More intuitively phrased:
+
+\begin{enumerate}
+    \item[(\ref{eq:neglig_1})] Executing a negligible function and another negligible function after each other will still result in something negligible.
+    \item[(\ref{eq:neglig_1})] Executing a negligible function for any polynomial number of times will still result in a negligible value in sum because the negligible function approaches zero faster than any polynomial function could grow towards positive values.
+    \item[(\ref{eq:neglig_1})] Subtracting something negligible from something non-negligible does not make a difference \textendash{} the result is still non-negligible.
+\end{enumerate}
+
+\subsection{Semantic Security \textendash{} A Simulation-Based Definition}
+\label{sec:semantic_securits}
+
+A cryptographic process is semantically secure if for all PPT attacker algorithms $A$, which calculate information $f(m)$ about a length-invariant message $m$ (message of given length $n$) with the help of the message's ciphertext $c$ with a certain probability, there is a simulator algorithm $S$, which can compute the same information with a negligibly different probability:
+
+$$
+    Pr[A(1^{n},c) = f(m)] \approx Pr[S(1^{n}) = f(m)]
+$$
+
+More intuitively speaking, everything which can be computed with the knowledge about the ciphtertext of a message can also be computed with nearly the same precision without knowledge about the ciphertext.
+
+This is the simulation-based definition of asymptotic security.
+
+\subsection[Indistinguishability (IND) \textendash{} a Game-Based Definition]{Indistinguishability (IND) Security \textendash{} a Game-Based Definition}
+
+This is a game-based definition of asymptotic security, which is equivalent to the semantic security definition (\ref{sec:semantic_securits}).
+
+A cryptographic process $\mathcal{E}$ is indistinguishable (IND) if for all PPT attackers $A$ applies:
+
+$$
+    Pr[Exp_{\mathcal{E}, A}^{IND}(n) = 1] \approx \frac{1}{2}
+$$
+
+, where $Exp_{\mathcal{E}, A}^{IND}(n)$ is defined as the following algorithm:
+
+\begin{align}
+    KGen(1^{n})   & \rightarrow k                                       \label{eq:ind:keygen}      \\
+    \{0, 1\}      & \rightarrow b             \label{eq:ind:choose_b}                              \\
+    A(1^n)        & \rightarrow (st, m_0, m_1) | \quad |m_0| = |m_1| = n \label{eq:ind:choose_msg} \\
+    Enc(m_b, k)   & \rightarrow c                          \label{eq:ind:enc_msg}                  \\
+    A(1^n, st, c) & \rightarrow   \label{eq:ind:decide}                                  a         \\
+    return \quad a == b \label{eq:ind:ret}
+\end{align}
+
+More intuitive worded, this means that (\ref{eq:ind:keygen}) a secret key of length $n$ is chosen (\ref{eq:ind:choose_b}) a secret random bit is chosen (\ref{eq:ind:choose_msg}) the attacker selects two messages of his choice (\ref{eq:ind:enc_msg}) one through $b$ randomly selected message is encrypted (\ref{eq:ind:decide}) the attacker looks at the ciphertext of one of its messages and decides which messages ciphertext that is and (\ref{eq:ind:ret}) the experiment returns true if the attacker has been able to identify the message and otherwise false. If the output of this experiment is negligible close to $\frac{1}{2}$ for all attackers $A$, then the attackers have no significant advantage over simply guessing and, therefore, the cryptographic process $\mathcal{E}$ is secure.
+
+An example of an insecure process $\mathcal{E}$ could be an algorithm, which simply flips all bits: $Enc(m, k) = \thicksim(m)$. The attacker could then just use the $Enc$ algorithm (which is not secret) with any key and get the same result because the $Enc$ algorithm does not use the key. Therefore, he could distinguish messages with the probability of $1 \not\approx \frac{1}{2}$.
+
+An example of a secure algorithm is Shannon's OTP. The reason is that without knowing the key, the attacker cannot distinguish two messages, because the OTP flips bits with the probability of $\frac{1}{2}$, such that the cipthertext is completely random, just like the key.
+
+
+\section{Pseudo Random (Number) Generators (PR(N)G)}
+
+An algorithm $G$ is a secure PRG, if for all PPT attackers $A$ applies:
+
+$$
+    Pr[Exp_{\mathcal{G,D,0}, A}^{PRG}(n) = 1] \approx \frac{1}{2}
+$$
+
+, where $Exp_{\mathcal{G,D,0}, A}^{PRG}(n)$ is defined as:
+
+\begin{align}
+    KGen(1^n)        & \rightarrow k   \\
+    \{0, 1\}         & \rightarrow b   \\
+    G(k)             & \rightarrow y_0 \\
+    \{0, 1\}^{|y_0|} & \rightarrow     \\
+    A(1^n, y_b)      & \rightarrow a   \\
+    return           & \quad a == b
+\end{align}
+
+More intuitively speaking, this means if we generate a pseudo-random bitstring $y_0$ using $G$ and a fully random bitstring $y_1$, no attacker algorithm can distinguish them.
