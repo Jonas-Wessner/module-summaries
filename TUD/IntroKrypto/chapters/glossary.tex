@@ -24,3 +24,13 @@ Completely hiding the length of a message is impossible if the length of possibl
 \section{Insecurity of Shift-Ciphers}
 
 Shift-ciphers, like Ceasar, are not perfectly secure, which can be shown by contraposition: If the possible messages are defined as $M=\{aa, ab\}$, a shift cipher shifting each character by some number of characters in an alphabet would always create ciphertexts as follows $Dec(aa) \rightarrow c_{0}c{0}$ and $Dec(ab) \rightarrow c_{0}c_{1} \quad|\quad c_{0} \neq c_{1}$ Therefore, an attacker's probability when seeing the ciphertexts to guess the correct message $m \in M$ is equal to $1$ and greater than the initial probability, which was $\frac{1}{2}$. A concrete example would be: $Pr[M=aa | C=c_{0}c_{0}] = 1 \neq Pr[M=aa] = \frac{1}{2}$. We see that limiting the set of possible messages can be a helpful method for contradictions of perfect correctness.
+
+\section{Criteria for Correct Reduction Proofs}
+
+If using reduction for proving the security of a cryptographic process, the following points must be addressed:
+
+\begin{enumerate}
+    \item Show the reduction algorithm as text, pseudo-code or picture
+    \item Show that the reduction algorithm is efficient
+    \item Show that the reduction algorithm wins the outer game with non-negligible advantage.
+\end{enumerate}
