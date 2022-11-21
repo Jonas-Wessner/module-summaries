@@ -223,4 +223,18 @@ Regardless of the function $F$, the Feistel function can be reversed by applying
 
 The Feistel function provides the reversibility of the function, however, it does not provide the security itself. The security is provided by the internally utilized function $F$. In DES this function is using so-called S- and P-boxes, whose details go beyond the scope of this course. What is important, however, is that $F$ implements Shannon's Concept of \textit{confusion and diffusion} and that it takes a part of the key $k_i$ and a bitstring as an input. The function $F$ is, in fact, a non-reversible function.
 
-% TODO: continue here (DES3 and others)
+56 bits ($2^{56}$ possibilities) were soon not sufficient for security against brute-force attackers on modern hardware. What could have been done to increase its security would be creating a new encryption algorithm, which works like DES but uses a longer key. But to reduce the effort required to increase DES's security, another approach was used \textendash{} applying DES multiple times with different keys.
+
+The first approach would be to compute DES two times with two different keys to achieve the security of $2^{112}$, because brute force a ciphertext, the attacker would have to compute all possible combinations of keys of the first DES and keys of the second DES $2^{56} \cdot 2^{56}$. But if an attacker would know the plain text $m$ and the ciphertext $c$ of a message, he could use a \textit{meet-in-the-middle} attack to drastically reduce the computational effort for brute forcing. In the following, the computation of double DES is shown:
+
+$$
+    m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES_{2}(key_2, c') \rightarrow c
+$$
+
+An attacker could then first compute all possible intermediate ciphertexts $c'$ for all possible values of $k_1$ from $m$ and save the results in a hashmap. Then he could compute all possible intermediate ciphertexts $c'$ with all possible values of $k_2$ from $c$ using $DES_2^{-1}$. The computation required is equal to $2^{56} + 2^{56} = 2 \cdot 2^{56} = 2^{57}$ instead of $2^{112}$. To obtain the correct combination of $k_1$ and $k_2$, the attacker would then search for collisions i.e. for pairs $(k_1, k_2)$ that produced the same intermediate ciphertext $c'$.
+
+For this reason, double DES is not useful. Instead, Triple DES is used, which has the security of $2^{112}$, because the attacker can use a meet-in-the-middle attack but has to calculate two DES on one of the sides. Triple DES uses the inverse operation (reverse order key parts of $k_2$) of $DES_2$ for the second DES. The reason is that there was uncertainty about whether DES could be a \textit{group}, such that there might be one $DES_{x}$ operation, which would be equal to the combination of $DES$ one to three. Later, however, it was discovered, that DES is not a group and inverting the middle DES was, therefore, not required:
+
+$$
+m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES^{-1}_{2}(key_2, c') \rightarrow c'' \rightarrow DES_{3}(key_3, c'') \rightarrow c
+$$
