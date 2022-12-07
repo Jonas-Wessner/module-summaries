@@ -184,8 +184,9 @@ This approach is nice, but it is not practicable, because the sender and the rec
 
 \section{Pseudo Random Functions (PRF)}
 
-A PRF is a function $F(k,x) \rightarrow y$, which takes a (secret) key and a seed an $x$-value as input and produces a pseudo-random output with the following characteristics:
+A PRF $PRF :=  K \times \{0,1\}^{in(\gamma)} \rightarrow \{0,1\}^{out(\gamma)}$ is a family of functions. When choosing a concrete $k$, the resulting function $f \in F$ is a pseudo-random function. For different key values, the function behaves like a different pseudo-random function.
 
+Another way to explain this is that a PRF is a function $F(k,x) \rightarrow y$, which takes a (secret) key and a seed an $x$-value as input and produces a pseudo-random output with the following characteristics:
 
 \begin{itemize}
     \item $y_0$ and $y_1$, generated as $F(k,x_0) \rightarrow y_0$ and $F(k,x_0) \rightarrow y_0$, are different, if $x_0 \neq x_1$ and are equal if $x_0 = x_1$.
@@ -236,5 +237,5 @@ An attacker could then first compute all possible intermediate ciphertexts $c'$ 
 For this reason, double DES is not useful. Instead, Triple DES is used, which has the security of $2^{112}$, because the attacker can use a meet-in-the-middle attack but has to calculate two DES on one of the sides. Triple DES uses the inverse operation (reverse order key parts of $k_2$) of $DES_2$ for the second DES. The reason is that there was uncertainty about whether DES could be a \textit{group}, such that there might be one $DES_{x}$ operation, which would be equal to the combination of $DES$ one to three. Later, however, it was discovered, that DES is not a group and inverting the middle DES was, therefore, not required:
 
 $$
-m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES^{-1}_{2}(key_2, c') \rightarrow c'' \rightarrow DES_{3}(key_3, c'') \rightarrow c
+    m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES^{-1}_{2}(key_2, c') \rightarrow c'' \rightarrow DES_{3}(key_3, c'') \rightarrow c
 $$
