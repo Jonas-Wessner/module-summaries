@@ -182,7 +182,9 @@ An approach for making an encryption method using a secure PRG IND-CPA secure co
 For each message to encrypt, call the PRG first to generate a key that is twice as long as the fixed-size message length. Then use the first half of the PRG output for encryption and save the second part. The first seed for the PRG will be taken from a $KGen$ algorithm. The following keys will be the second half of the PRG in the previous iteration. Because the PRG output is pseudo-randomized, it is also a secure seed.\\
 This approach is nice, but it is not practicable, because the sender and the receiver must be synchronized, which might fail because of insecure connections with message retransmissions.
 
-\section{Pseudo Random Functions (PRF)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pseudo Random Functions (PRF) (Exercise 5)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A PRF $PRF :=  K \times \{0,1\}^{in(\gamma)} \rightarrow \{0,1\}^{out(\gamma)}$ is a family of functions. When choosing a concrete $k$, the resulting function $f \in F$ is a pseudo-random function. For different key values, the function behaves like a different pseudo-random function.
 
@@ -193,10 +195,21 @@ Another way to explain this is that a PRF is a function $F(k,x) \rightarrow y$, 
     \item A CPA attacker cannot distinguish the output of a PRF from a truly random function, which would do the same thing but in a truly randomized fashion.
 \end{itemize}
 
+A PRF with equal input and output length is called length-preserving.
+
 Defining a (secure) PRF using a game would involve creating a challenger which randomly chooses a hidden bit $b$ and, depending on that bit, calls the PRF or a truly random function. For both, the truly random function and the PRF, the outputs must be deterministic (consistent), such that if the same $x$ value is provided as input, the same $y$ value will be emitted.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pseudo Random Permutations (PRPs) (Exercise 6)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+A pseudo-random permutation is, similar to a pseudo-random function, a family of functions, which a concrete function can be selected from by choosing a key. A pseudo-random permutation is defined as $\{0,1\}^s \times \{0,1\}^l \rightarrow \{0,1\}^l$ with the key length $s$, and the input and output length $l$. The input space and the output space of a PRP are equal and the PRP defines a bijective permutation on the set of input bit strings (not on the set of input bits), making a PRP an invertible function. In other words, every possible bitstring is mapped to another bitstring of the same length. Each output bitstring belongs to exactly one input bitstring. Every PRP is a length-preserving PRF.
+
+The security for a PRP is defined through a game, similar to the game defining a secure PRF. Because the PRF is invertible, it does not only provide a function $f$, but also an inverse function $f^{-1}$. The game based CPA-IND definition states that, for a chosen bitstring, a distinguisher $D$ cannot distiguish the PRPs output of $f(x)$ or $f^{-1}(x)$ from the output of a real random permutation or its inverse operation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data Encryption Standard (DES)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 DES is a block cipher, which was used until about the year 2000. Because of its short keys, it was later replaced with DES3 and eventually by AES.
 
@@ -239,3 +252,51 @@ For this reason, double DES is not useful. Instead, Triple DES is used, which ha
 $$
     m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES^{-1}_{2}(key_2, c') \rightarrow c'' \rightarrow DES_{3}(key_3, c'') \rightarrow c
 $$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Advanced Encryption Standard (AES) (Exercise 6)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The security of DES (56-bit keys) and DES3 (112-bit security) is not sufficient. For this reason, the NIST started a public challenge for creating a cryptographic process replacing DES in 1979. The winner of this contest was decided to be Rijndael in 2000, which is the basis for the nowadays used advanced encryption standard (AES). AES is Rijndael, which can generally work with different input and output sizes (block sizes), with a block size of 128-bit. The key length for AES can be chosen to be 128, 192 or 256-bit.
+
+AES is a substitution permutation network. This means it tries to replace bits with other bits (substitution) and change the order of bits (permutation)\footnote{Note that here permutation is a permutation on the set of bits, whereas the \textit{permutation} in PRP refers to a permutation on the set of the different bit strings.}.
+
+AES takes a 128-bit string as input and stores it as a $4 \times 4$ two-dimensional matrix, where each element is an 8-bit substring. Then it executes the following operations on the matrix for a minimum of 10 rounds\footnote{The number of rounds can be greater if longer keys are used.}:
+
+\begin{itemize}
+    \item \textit{AddRoundKey:} The round key, which is a substring of the expanded input key, is XORed to the message.
+    \item \textit{SubBytes:} Every byte is replaced by another byte according to a fixed replacement scheme (S-box).
+    \item \textit{ShiftRows:} The bytes of each row are shifted depending on the row number (row 0 is not shifted, row 1 is shifted 1 element, ...).
+    \item \textit{MixColumns:} Same as ShiftRows but for columns.
+\end{itemize}
+
+In the last round, AddRoundKey is executed instead of MixColumns. SubBytes is the substitution and ShiftRows and MixColumns are the permutation of the substitution permutation network.
+
+AES is an IND-CPA secure PRP (and therefore also an IND-CPA secure PRF).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Block Cipher Modes of Operation (Exercise 6)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The main characteristic of block ciphers is that they can only encrypt bit strings of fixed size.
+However, the message size is usually variable and greater than the input size of the block cipher.
+Therefore, a method is needed to use block ciphers for messages with arbitrary lengths.
+Generally speaking, messages are divided into chunks that match the input length of the block cipher used.
+Then the mode of operation provides a schema for the encryption of the individual blocks utilizing a block cipher.
+If the message length is not a multiple of the block cipher's input length, padding must be added to the last block of the plain text message before encrypting. Usually, this will be a $1$ followed by the required number of zeroes. This way, the padding can be identified after decrypting by removing all zeroes from the right side until a $1$ appears.
+
+% TODO: add pictures here 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Electronic Code Book (ECB)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This is the simplest mode of operation. It encrypts every part of the message independently with the same unmodified key. This is not IND-CPA secure, because equal plain text blocks are encrypted to equal ciphertext blocks.\footnote{For formal proof of insecurity, see the solution of exercise sheet 6.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cipher Block Chaining (CBC)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Output Feedback Mode (OFB)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
