@@ -264,7 +264,7 @@ AES is a substitution permutation network. This means it tries to replace bits w
 AES takes a 128-bit string as input and stores it as a $4 \times 4$ two-dimensional matrix, where each element is an 8-bit substring. Then it executes the following operations on the matrix for a minimum of 10 rounds\footnote{The number of rounds can be greater if longer keys are used.}:
 
 \begin{itemize}
-    \item \textit{AddRoundKey:} The round key, which is a substring of the expanded input key, is XORed to the message.
+    \item \textit{AddRoundKey:} The round key, which is a substring of the expanded input key, is added ($\oplus$) to the message.
     \item \textit{SubBytes:} Every byte is replaced by another byte according to a fixed replacement scheme (S-box).
     \item \textit{ShiftRows:} The bytes of each row are shifted depending on the row number (row 0 is not shifted, row 1 is shifted 1 element, ...).
     \item \textit{MixColumns:} Same as ShiftRows but for columns.
@@ -293,10 +293,84 @@ If the message length is not a multiple of the block cipher's input length, padd
 
 This is the simplest mode of operation. It encrypts every part of the message independently with the same unmodified key. This is not IND-CPA secure, because equal plain text blocks are encrypted to equal ciphertext blocks.\footnote{For formal proof of insecurity, see the solution of exercise sheet 6.}
 
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/ecb_enc_scheme.png}
+    \caption{ECB Encryption}
+    \label{fig:ecb_enc}
+\end{figure}
+
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/ECB_dec_scheme.png}
+    \caption{ECB Decryption}
+    \label{fig:ecb_dec}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cipher Block Chaining (CBC)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Cipher block chaining adds ($\oplus$) the previous cipher block to the message before applying the block cipher in each step. Because the cipher blocks are pseudo-random, the input to the block cipher is also pseudo-random, which makes it output pseudo-random. Because for the first block, there is no previous cipher text block, a random initialization vector $IV$ is used. CBC is IND-CPA secure.
+
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/CBC_enc_scheme.png}
+    \caption{CBC Encryption}
+    \label{fig:cbc_enc}
+\end{figure}
+
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/CBC_dec_scheme.png}
+    \caption{CBC Decryption}
+    \label{fig:cbc_dec}
+\end{figure}
+
+\textbf{Advantages:}
+
+\begin{itemize}
+    \item Parallel Decryption is possible
+    \item Loss of a cipher block $c_i$ during transmission only affects plain text blocks $m$ and $m+1$ after decryption (minor advantage)
+\end{itemize}
+
+\textbf{Disadvantages:}
+
+\begin{itemize}
+    \item Encryption can only happen sequentially
+    \item Decryption requires inverse block cipher
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output Feedback Mode (OFB)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The OFB uses the output of the block cipher of the previous iteration as input to the block cipher of each iteration. Because the previous output of the block cipher is pseudo-random, the output of each block cipher is pseudo-random. OFB is IND-CPA secure.
+
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/OFB_enc_scheme.png}
+    \caption{OFB Encryption}
+    \label{fig:ofb_enc}
+\end{figure}
+
+\begin{figure}
+    \center
+    \includegraphics[width=\linewidth]{gfx/OFB_dec_scheme.png}
+    \caption{OFB Decryption}
+    \label{fig:ofb_dec}
+\end{figure}
+
+\textbf{Advantages:}
+
+\begin{itemize}
+    \item No inverse operation of the block cipher is required
+    \item No padding is required
+    \item The block cipher output can be precalculated because it does not depend on the message. As soon as a message arrives, the block-cipher output can be added ($\oplus$) to the message (in parallel possible).
+\end{itemize}
+
+\textbf{Disadvantages:}
+
+\begin{itemize}
+    \item Encryption and Decryption can only happen sequentially
+\end{itemize}
