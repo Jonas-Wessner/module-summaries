@@ -205,7 +205,11 @@ Defining a (secure) PRF using a game would involve creating a challenger which r
 
 A pseudo-random permutation is, similar to a pseudo-random function, a family of functions, which a concrete function can be selected from by choosing a key. A pseudo-random permutation is defined as $\{0,1\}^s \times \{0,1\}^l \rightarrow \{0,1\}^l$ with the key length $s$, and the input and output length $l$. The input space and the output space of a PRP are equal and the PRP defines a bijective permutation on the set of input bit strings (not on the set of input bits), making a PRP an invertible function. In other words, every possible bitstring is mapped to another bitstring of the same length. Each output bitstring belongs to exactly one input bitstring. Every PRP is a length-preserving PRF.
 
-The security for a PRP is defined through a game, similar to the game defining a secure PRF. Because the PRF is invertible, it does not only provide a function $f$, but also an inverse function $f^{-1}$. The game based CPA-IND definition states that, for a chosen bitstring, a distinguisher $D$ cannot distiguish the PRPs output of $f(x)$ or $f^{-1}(x)$ from the output of a real random permutation or its inverse operation.
+A \textit{secure} (weak \textit{PRP}) is defined just like the definition for the secure PRF (as it is also a PRF).
+
+In contrast to PRFs and PRGs, PRPs also have a \textit{strong} security definition.
+A PRP is strong if is secure under chosen plain text attacks if the attacker can access the PRP and its inverted operation PRP$^{-1}$.
+The game-based CPA-IND definition states that, for a chosen bitstring, a distinguisher $D$ cannot distinguish the PRPs output of $f(x)$ or $f^{-1}(x)$ from the output of a real random permutation or its inverse operation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data Encryption Standard (DES)}
