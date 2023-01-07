@@ -317,14 +317,14 @@ This is the simplest mode of operation. It encrypts every part of the message in
 
 Cipher block chaining adds ($\oplus$) the previous cipher block to the message before applying the block cipher in each step. Because the cipher blocks are pseudo-random, the input to the block cipher is also pseudo-random, which makes it output pseudo-random. Because for the first block, there is no previous cipher text block, a random initialization vector $IV$ is used. CBC is IND-CPA secure.
 
-\begin{figure}
+\begin{figure}[h]
     \center
     \includegraphics[width=\linewidth]{gfx/CBC_enc_scheme.png}
     \caption{CBC Encryption}
     \label{fig:cbc_enc}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
     \center
     \includegraphics[width=\linewidth]{gfx/CBC_dec_scheme.png}
     \caption{CBC Decryption}
@@ -351,14 +351,14 @@ Cipher block chaining adds ($\oplus$) the previous cipher block to the message b
 
 The OFB uses the output of the block cipher of the previous iteration as input to the block cipher of each iteration. Because the previous output of the block cipher is pseudo-random, the output of each block cipher is pseudo-random. OFB is IND-CPA secure.
 
-\begin{figure}
+\begin{figure}[h]
     \center
     \includegraphics[width=\linewidth]{gfx/OFB_enc_scheme.png}
     \caption{OFB Encryption}
     \label{fig:ofb_enc}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
     \center
     \includegraphics[width=\linewidth]{gfx/OFB_dec_scheme.png}
     \caption{OFB Decryption}
@@ -377,4 +377,54 @@ The OFB uses the output of the block cipher of the previous iteration as input t
 
 \begin{itemize}
     \item Encryption and Decryption can only happen sequentially
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cipher Feedback (CFB)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+CFB is a variant of OFB.
+Instead of using the output of the block cipher as the input of the next block cipher, the ciphertext block is taken as the next input to the block cipher.
+The advantages and disadvantages are the same as those of OFB.
+
+\begin{figure}[h]
+    \center
+    \includegraphics[width=\linewidth]{gfx/cfb_enc.png}
+    \caption{CFB Encryption}
+    \label{fig:cfb_enc}
+\end{figure}
+
+\begin{figure}[h]
+    \center
+    \includegraphics[width=\linewidth]{gfx/cfb_dec.png}
+    \caption{CFB Decryption}
+    \label{fig:cfb_dec}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Counter Mode (CTR)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The counter mode uses a combination of a key (here called initialization vector or Nonce) and a counter.
+
+\begin{figure}[h]
+    \center
+    \includegraphics[width=\linewidth]{gfx/enc_ctr.png}
+    \caption{CTR Encryption (Decryption analogous, switch plain text and cipher text)}
+    \label{fig:ctr_enc}
+\end{figure}
+
+\textbf{Advantages:}
+
+\begin{itemize}
+    \item Fully parallelizable encryption and decryption
+    \item Transmission error in cipher text block $c_i$ only affects plain text block $m_i$
+    \item No padding for last plain text block necessary
+    \item No inverse operation of the block cipher is required
+\end{itemize}
+
+\textbf{Disadvantages:}
+
+\begin{itemize}
+    \item Security is reduced by the number of bits that are used as counter bits.
 \end{itemize}
