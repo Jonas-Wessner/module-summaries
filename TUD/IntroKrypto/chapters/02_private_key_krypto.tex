@@ -428,3 +428,45 @@ The counter mode uses a combination of a key (here called initialization vector 
 \begin{itemize}
     \item Security is reduced by the number of bits that are used as counter bits.
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Message Authentication Codes and EUF-CMA}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Encryption methods only ensure \emph{confidentiality} and are not enough to ensure secure communication. What we want to do is to complement confidentiality with \emph{integrity} and \emph{authenticity}. These properties can be achieved by using \acp{MAC}. \acp{MAC} are checksums that include a secret key in their calculation. That way, if the \ac{MAC} is secure, the receiver of a message can be sure that the message has not been modified if the provided checksum is valid since no attacker can create a matching checksum for a modified message without knowing the secret key.
+
+The security of a \ac{MAC} is defined through the game-based definition of EUF-CMA, which stands for existential unforgeability under chosen message attacks. The attacker $A$ can query as many \acp{MAC} from the \ac{MAC} oracle as it wants. Eventually, $A$ must emit a pair $(m,\tau)$ of a message and a corresponding \ac{MAC}. The attacker $A$ is successful if $\tau$ matches the message $m$ and if the message $m$ has not been queried before.
+
+A slightly stronger variant of EUF-CMA is sEUF-CMA (\emph{strong} EUF-CMA). A \ac{MAC} is sEUF-CMA if the attacker $A$ also wins the game if it finds another \ac{MAC} that is valid for a queried message $m$. That means that the requirements for the attacker's output are less strict. It is not required that the message $m$ has not been queried before, but only that the pair $(m,\tau)$ has not been queried before. Since this gives the attacker additional opportunities to break the \ac{MAC}, the \ac{MAC} must be more secure.
+
+%-------------------------------------------------
+\section{PRF-MAC}
+%-------------------------------------------------
+
+Every pseudo-random function is also a MAC for messages \emph{with the size of its input length}.
+To realize that, the MAC for a message $m$ is calculated by using the PRFs function value at position $m$ using the key $k$ as $MAC := PRF(k,m)$.
+To break this MAC an attacker would have to guess the value of a strong PRF without knowing the key, which is not possible.
+Hence, the security of PRF-MACs can be proved using a reduction to the IND-CPA security of the used PRF.
+
+%-------------------------------------------------
+\section{CBC-MAC}
+%-------------------------------------------------
+
+To overcome the limitations that PRF-MAC has for the input message's length, MACs built based on block ciphers can be used.
+The block cipher is calculated for the entire message.
+Then the last ciphertext block is emitted.
+We had seen earlier that the security of block ciphers requires a \emph{random} initialization vector $IV$.
+This is different when building MACs based on block ciphers.
+Since the first ciphertext block is not transmitted, the receiver would not have a chance to recalculate the MAC as the information about the $IV$ is not transmitted.
+One could decide to transmit the $IV$ as well. This, however, would allow the attacker to modify the message and the $IV$, which may allow him to find a matching MAC for the modified message when using the modified $IV$.
+Hence, CBC-MACs using random $IV$s and transmitting them are not secure.
+Instead, CBC-MACs should use a \emph{constant} $IV$ (usually just $0^\lambda$, which is equivalent to no $IV$).
+
+% TODO: insecurity of CBC mac with different message sizes (01:10:40)
+
+% TODO: CBC-MAC implementation from US government
+
+
+%-------------------------------------------------
+\section{HMAC}
+%-------------------------------------------------
