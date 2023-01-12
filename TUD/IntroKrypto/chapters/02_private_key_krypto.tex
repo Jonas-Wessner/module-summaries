@@ -312,19 +312,19 @@ This is the simplest mode of operation. It encrypts every part of the message in
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Cipher Block Chaining (CBC)}
+\subsection{Cipher Block Chaining (CBC)}\label{sec:CBC}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Cipher block chaining adds ($\oplus$) the previous cipher block to the message before applying the block cipher in each step. Because the cipher blocks are pseudo-random, the input to the block cipher is also pseudo-random, which makes it output pseudo-random. Because for the first block, there is no previous cipher text block, a random initialization vector $IV$ is used. CBC is IND-CPA secure.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/CBC_enc_scheme.png}
     \caption{CBC Encryption}
     \label{fig:cbc_enc}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/CBC_dec_scheme.png}
     \caption{CBC Decryption}
@@ -351,14 +351,14 @@ Cipher block chaining adds ($\oplus$) the previous cipher block to the message b
 
 The OFB uses the output of the block cipher of the previous iteration as input to the block cipher of each iteration. Because the previous output of the block cipher is pseudo-random, the output of each block cipher is pseudo-random. OFB is IND-CPA secure.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/OFB_enc_scheme.png}
     \caption{OFB Encryption}
     \label{fig:ofb_enc}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/OFB_dec_scheme.png}
     \caption{OFB Decryption}
@@ -380,21 +380,21 @@ The OFB uses the output of the block cipher of the previous iteration as input t
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Cipher Feedback (CFB)}
+\subsection{Cipher Feedback (CFB)}\label{sec:CBF}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 CFB is a variant of OFB.
 Instead of using the output of the block cipher as the input of the next block cipher, the ciphertext block is taken as the next input to the block cipher.
 The advantages and disadvantages are the same as those of OFB.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/cfb_enc.png}
     \caption{CFB Encryption}
     \label{fig:cfb_enc}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/cfb_dec.png}
     \caption{CFB Decryption}
@@ -407,7 +407,7 @@ The advantages and disadvantages are the same as those of OFB.
 
 The counter mode uses a combination of a key (here called initialization vector or Nonce) and a counter.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \center
     \includegraphics[width=\linewidth]{gfx/enc_ctr.png}
     \caption{CTR Encryption (Decryption analogous, switch plain text and cipher text)}
@@ -462,11 +462,73 @@ One could decide to transmit the $IV$ as well. This, however, would allow the at
 Hence, CBC-MACs using random $IV$s and transmitting them are not secure.
 Instead, CBC-MACs should use a \emph{constant} $IV$ (usually just $0^\lambda$, which is equivalent to no $IV$).
 
-% TODO: insecurity of CBC mac with different message sizes (01:10:40)
+CBC-MAC (see section \ref{sec:CBC} for details on CBC) is not EUF-CMA if messages with different lengths are allowed because it is vulnerable to length-extension attacks.
+In this kind of attack, the attacker chooses a message $m_1$ with the same length as the output of the MAC.
+Then the attacker receives $\tau_1$ from the $MAC$ oracle.
+Then the attacker sends a second request with $m_2 = \tau_1 \oplus m_1$ to the oracle and receives $\tau_2$.
+Now the attacker emits the pair $(m_3 = m_1||m_1,\; \tau_2)$.
+$\tau_2$ is a valid MAC for $m_3$, because the CBC-MAC computes
+$$\tau_3 = PRF(PRF(m_1) \oplus m_1) = PRF(\tau_1 \oplus m_1) = \tau_2$$
+Also, the pair $(m_3,\tau_2)$ is new, because $m_3$ has never been queried before.
+Only parts of $m_3$ have been queried.
 
-% TODO: CBC-MAC implementation from US government
-
+CMAC is an adapted implementation of CBC-MAC developed by the US government that \emph{is secure} with different message sizes.
+To achieve that, CMAC XORs another key to the last plain text block.
+This way, the MAC of one message is \emph{not} equal to what the PRF would expect as input for an extended version of the message.
 
 %-------------------------------------------------
 \section{HMAC}
 %-------------------------------------------------
+
+Another way to construct a MAC is by using hash functions (which will be covered in more detail in a later chapter). The kind of hash function that we want to use is a pseudo-random function (PRF) with much greater output than input length (to compress effectively) and a key length equal to the output length (to chain hash calls by using the output of one iteration as the key for next iteration). This construction is illustrated in Figure \ref{fig:HMAC}. In order to not be vulnerable to length extension attacks it is important to add a \emph{final} step that involves using a different key than the previous steps.
+
+If $f$ is a good PRF, the construction is also a good PRF. Since every good PRF is also a good MAC for a fixed input length, the construction is secure for input messages of the same length.
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=\linewidth]{gfx/HMAC.png}
+    \caption{Construction of HMAC using Merkle-Damgard construction.}
+    \label{fig:HMAC}
+\end{figure}
+
+%++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{IND-CCA Security}\label{sec:IND_CCA}
+%++++++++++++++++++++++++++++++++++++++++++++++++++
+
+IND-CCA security is a stronger security definition compared to IND-CPA security.
+Its security is defined through a game shown in Figure \ref{fig:IND_CCA}.
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=\linewidth]{gfx/IND_CCA.png}
+    \caption{Game-based definition of IND-CCA security}
+    \label{fig:IND_CCA}
+\end{figure}
+
+The attacker has access to two oracles.
+The $ENC$ oracle can be queried with two messages $m_0$ and $m_1$ and returns the ciphertext $c_b$ of one of those messages.
+Which of the messages is encrypted by a secretly chosen bit $b$ that the attacker $A$ has to be found out by the attacker to be successful.
+The $DEC$ oracle can be queried with a ciphertext $c$ and will return the corresponding plain text $m$.
+But $DEC$ will only be useful if the same ciphertext $c$ has never been returned by the $ENC$ oracle before.
+Because that would make the attack trivial, because the attacker could then obtain a $c_b$ from $ENC$, decrypt it using $DEC$ and obtain $m_b$ and see what message has been encrypted by looking at $m_b$.
+
+Every IND-CCA secure system is also END-CPA secure because not using the $DEC$ oracle is also a valid IND-CCA attack. Using reduction, it can easily be shown that an IND-CPA attacker for $\epsilon$ could be used to break IND-CAA for $\epsilon$, if such an attacker would exist. Therefore, such an attacker cannot exist, which means that $\epsilon$ must be IND-CPA secure if it is IND-CCA secure.
+
+A common way to \emph{construct} an IND-CAA secure system is to use the \emph{Encrypt-then-MAC} scheme.
+This scheme first uses an IND-CPA secure encryption mechanism to encrypt a message and then uses an sEUF-CMA secure MAC to tag it.
+The encryption output is the combination of the encrypted message and the tag of the ciphertext.
+When decrypting, an error is produced if the tag does not match the message's ciphertext.
+For this reason, an attacker can not use the $DEC$ oracle in a useful way since he will not obtain an answer unless he forges the tag, which is not possible.
+As a result, the attacker effectively only has access to the $ENC$ oracle, which is not sufficient for breaking the system, since the encryption method is IND-CPA secure.
+The encrypt-then-MAC construction is shown in its algorithmic representation in Figure \ref{fig:encrypt_then_mac}.
+
+\begin{figure}[H]
+    \center
+    \includegraphics[width=\linewidth]{gfx/EncryptThenMAC.png}
+    \caption{Secure encrypt-then-MAC construction based on an IND-CPA secure encryption $Enc$ and decryption $Dec$ and an sEUF-CMA secure MAC ($Mac$ and $Vf$)}
+    \label{fig:encrypt_then_mac}
+\end{figure}
+
+
+% TODO: Galois/Counter Mode (if relevant for exam)
+
