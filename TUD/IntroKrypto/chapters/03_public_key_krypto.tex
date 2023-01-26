@@ -1,0 +1,88 @@
+\chapter{Public-Key Cryptography}\label{ch:pub_key_crypto}
+
+%------------------------------------------
+\section{Introduction}\label{sec:pubkey:intro}
+%------------------------------------------
+
+Public-key methods use the following functions for encrypting and decrypting:
+
+\begin{align*}
+    KGen(1^n)  & \rightarrow (sk, pk) \\
+    Enc(pk, m) & \rightarrow c        \\
+    Dec(sk, c) & \rightarrow m        \\
+\end{align*}
+
+Often, the public key can be computed efficiently from the secret key $f(pk) \rightarrow sk$.
+But for security, it is required that the reverse of this function $f^{-1}$, which computes the secret key from the public key is \emph{not} efficiently computable.
+We call such a function, that can only be efficiently computed in one direction a \emph{one-way function} (OWF).
+
+%----------------------------------------
+\section{One-Way Functions}\label{sec:owf}
+%----------------------------------------
+
+A one-way function (OWF) is a function $f: \{0,1\}^* \rightarrow \{0,1\}*$ that can be efficiently computed but its inverse function cannot be efficiently computed.
+
+Formally speaking, a function $f$ is one-way if it has the following two properties:
+
+\begin{enumerate}
+    \item There is an efficient algorithm PPT for computing values $f(x)$ for all allowed input parameters $x$.
+    \item For all efficient PPT algorithms A their success probability in the below security game $G^{inv}_{f,A}$ is negligible.
+\end{enumerate}
+
+$G^{inv}_{f,A}$ is defined as follows:
+
+\begin{align*}
+    \{0,1\}^\lambda & \$\rightarrow x \\
+    f (x)           & \rightarrow y   \\
+    A(1^\lambda, y) & \rightarrow x'  \\
+    return f(x) == x'
+\end{align*}
+
+\textbf{Note 1:} This game does not require the adversary $A$ to find the value $x$ used but merely requires it to find a value that produces the output for $f$ i.e. a collision.
+
+\textbf{Note 2:} This assumes that there are problems that are hard to compute (NP-hard). This is an assumption that holds so far but is not proven.
+
+%---------------------------------------------
+\section{Number Theory}\label{sec:number_theory}
+%---------------------------------------------
+
+\subsection{The Modulo Operator}
+
+The modulo operator allows us to calculate with residual rings, which means that all values will never exceed the number $m-1$ for a residual ring $Z_m$.
+We define addition and multiplication, such that they produce a value $x \in Z_m$ such that:
+
+\begin{align*}
+    a + b & = c mod m \quad |\quad \exists i \in Z: \quad a + b = c + i \cdot m     \\
+    a + b & = c mod m \quad |\quad \exists i \in Z: \quad a \cdot b = c + i \cdot m
+\end{align*}
+
+\subsection{Groups}
+
+A group is a combination $(G,\circ)$ of a set $G$ and an operation $\circ$ with the following 4 characteristics:
+
+\begin{itemize}
+    \item Closure: $a \circ b \in G \quad | \quad \forall a,b \in G$
+    \item Associativity: $a \circ (b \circ c) = (a \circ b) \circ c \quad \forall a,b,c \in G$
+    \item There exists an identity element (neutral element) $n$ such that $a \circ n = n \circ a = a \quad \forall a \in G$
+    \item There exists an inverse element $a^{-1}$ for all elements $a$ in $G$ that can turn $a$ into the neutral element if combined with the operation $\circ$: $\exists a^{-1} \in G: \quad a \circ a^{-1} = a^{-1} \circ a = n \quad \forall a \in G$.
+\end{itemize}
+
+We call a group an abelian group if it is a group for which the operation $\circ$ over $G$ is commutative for all elements in $G$:
+$a \circ b = b \circ a \quad \forall a,b \in G$.
+
+Groups, or abelian groups, are nice to work with in cryptography.
+Unfortunately, residual rings $Z_m$ are generally not groups if paired with the multiplication operator $(Z_m,\cdot)$ because they do not have inverse elements for all elements in $Z_m$. For example, each group $Z_m$ contains the value $0$, but no number can be multiplied by $0$ to produce the neutral element, which is $1$.
+Additionally, depending on $m$, other elements might have no inverse element as well.
+
+For this reason, we would like to reduce the set $Z$ to a set $Z_m^*$ that only contains all invertible elements of $Z_m$, thus making it a group.
+The invertible elements of $Z_m$ are exactly all elements for which the greatest common divisor ($gcd$) is equal to $0$.
+For instance, for the residual ring $Z_6 = \{0, 1, 2, 3, 4, 5\}$, the reduced group would be $Z_6^* = \{1, 5 \}$.
+
+The number of elements in $Z_m^*$ is well defined for a couple of cases for prime numbers $p$ and positive integers $k$:
+
+\begin{itemize}
+    \item $|Z_p^*| = p-1$ (all elements of $Z_m$ except $0$)
+    \item $|Z_{p^k}^*| = p^k - \frac{p^k}{p}$ (all elements except all multiples of p in $Z_{p^k}$)
+    \item % TODO: continue (c) at minute 54:00
+\end{itemize}
+
