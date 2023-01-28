@@ -126,7 +126,7 @@ because if we multiplied both sides by $a$, we would end up at the original equa
 \section{Discrete Logarithm Problem}\label{sec:discrete_log}
 %----------------------------------------------------
 
-Let $(G, \cdot)$ be a group with prime order $q$, $g$ be a generator for the group and further $y \in G$ an element in the group.
+Let $(G, \cdot)$ be a subgroup of $Z_p^*$ with prime order $q$, $g$ be a generator for the group and further $y \in G$ an element in the group.
 The logarithm problem describes the task to find the (smallest) exponent for which $g$ generates $y$:
 
 $$
@@ -141,9 +141,229 @@ The game $Exp^{DL}_{Gen,A}(1^\lambda)$ is defined as follows:
 
 \begin{align*}
     (G, q, g) & \leftarrow Gen(1^\lambda)           \\
-    x         & \leftarrow^\$ \; G                   \\
+    x         & \leftarrow^\$ \; G                  \\
     y         & \leftarrow g^x \; \text{in} \; G    \\
     x'        & \leftarrow A(1^\lambda, G, q, g, y) \\
     \text{return} \; [g^x \equiv y \; \text{in} \; G ]
 \end{align*}
+
+\section{Attacks Against The Discrete Logarithm}
+
+In this section, we show the known attacks against the discrete logarithm on groups $G, q, p$, where $q$ is the order of the (sub)group and $p$ is the order of the (super)group, in which we are calculating the modulo.
+
+\subsection{Brute Force}
+
+Try all values $g^0, g^1, g^2, g^3 (...)$ until the value $g^i = y$ is found.
+
+This trivial attack is on average not successful in an acceptable time because the attacker needs to try $\frac{1}{2} \cdot 2^\lambda$ of the possible $2^\lambda$ values on average. Therefore the runtime complexity is $O(\lambda)$
+
+\subsection{Giant-step-baby-step algorithm}\label{sec:giant_baby}
+
+\begin{enumerate}
+    \item \textit{Giant-steps:} set $t = \sqrt{ord(G)}$. Then compute $t$ giant step values from $k=0$ to $k=(t-1)$ that can be generated from $G$ with the distance of $t$ to each other as:\\
+          $g^{0t}, g^{1t}, g^{2t}, ... g^{t-1}$.
+    \item The value $y$, of which we would like to find the discrete log to the base of $g$ is $g^x$ in $G$ and is located between two of the precomputed giant steps. Also, its distance to the next giant step will be less than $t$, because the giant steps all have the distance $t$. So we now compute all values that can be generated from $g$ starting at $y$ until we reach the next giant step:\\
+          $y \cdot g^0, y \cdot g^1, y \cdot g^2 (...) \text{ until $y \cdot g^i$ matches one of the giant steps}$
+    \item Since we then know the next giant step and in how many steps it can be generated from $g$, we know that $y$ can be generated in $i$ fewer steps from $g$:\\
+          $x = k \cdot t - i$
+\end{enumerate}
+
+This algorithm has a memory complexity of $=(\sqrt{\lambda}$) and a computational complexity of $=\sqrt{\lambda}$
+
+\subsection{Pollard's Roh-Algorithm}\label{pollards_roh}
+
+This algorithm is very similar to the giant-step-baby-step algorithm but has constant memory complexity $O(1)$
+
+\subsection{Index Calculus}\label{sec:index_caclulus}
+
+This attack only works on $Z_p^*$ i.e. it does not work on elliptic curves.
+Its runtime complexity is:
+
+$$
+    2^{O(\sqrt{log(p)log(log(p))})}
+$$
+
+\subsection{Number Field Sieve}\label{sec:number_field_sieve}
+
+This attack also only works for $Z_p^*$ and not for elliptic curves.
+Its runtime complexity is:
+
+$$
+    2^{O(log(p)^{1/3} \cdot log(log(p))^{2/3})}
+$$
+
+
+\subsection{Implications of Attacks and Motivation for Elliptic Curves}
+
+From the attacks \ref{sec:giant_baby} and \ref{pollards_roh}, we see that the order of the subgroup $q$ must be chosen high enough, because the attacks have a square root runtime based on $q$. Today, we would say $q \geq 2^265$ is sufficient.
+
+From the attacks \ref{sec:index_caclulus} and \ref{sec:number_field_sieve}, we see that the range of numbers that we allow through the selection of $p$ must be even significantly greater than $q$ because the algorithms can break the $DL$ with logarithmic runtime based on $p$. Today, we would say $q \geq 3072$ would be sufficient.
+
+This means if we work on subgroups with prime order $q$ of $Z_p^*$, we have to allow bit strings with the length of $p = 3072$ bits even though we only use $2^q = 2^256$ of the possible $2^3072$ values.
+So this is not ideal.
+
+For this reason, today the discrete logarithm based on elliptic curves is used instead of on $Z_p^*$, prohibiting the index calculus (\ref{sec:index_caclulus}) and the number field sieve (\ref{sec:number_field_sieve}) attacks.
+Then we can use values of $q$ that are close to the value of $p$ and therefore use much shorter bit strings, which speeds up calculations.
+
+
+\section{Elliptic Curves}\label{sec:ell_curves}
+
+Elliptic curves are additive groups $E$ over groups like $Z_p^*$.
+All values of $E$ are tuples $(x,y)$ with $x$ and $y$ as elements in $Z_p^*$ that fulfill the equation of the elliptic curve for given $a$ and $b$. Additionally, the \textit{point at infinity} $\mathcal{O}$ is part of $E$:
+
+$$
+    E_{a,b}(Z_p^*) = \{ \forall x,y \in Z_p^* \; | \; y^2 = x^3 + ay + b \} \cup \{ \mathcal{O} \}
+$$
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \center
+    \includegraphics[width=\linewidth]{gfx/elliptic_curves_addition.png}
+    \caption{Illustration of addition on elliptic curves}
+    \label{fig:ell_curves_add}
+\end{wrapfigure}
+
+We define an addition operation for points on the elliptic curve.
+The addition can be illustrated as shown in Figure \ref{fig:ell_curves_add}.
+When two points $A$ and $B$ are added, first, the line that crosses both points will be found.
+This line will cross the curve at another point, which is the point $-A+B$.
+If we mirror the point on the x-axis, we get the point $A+B$ i.e the point resulting from the addition operation.
+
+In case both points are the same, the line will be the tangent of the curve.
+In case $A$ is added to $-A$, the line would be horizontal, thus not crossing the curve again.
+The result of this operation is defined as the point at infinity $\mathcal{O}$.
+
+When calculating with an elliptic curve, the concept is very similar to calculating in $mod$.
+We have a generator Point $\mathcal{G}$ on $E$, which we will add to itself to produce new points in $E$.
+The discrete logarithm problem on elliptic curves expresses \textit{how many times must $\mathcal{G}$ be added to itself to produce a Point Y?}:
+$DLog_{\mathcal{G}}^{E}(Y)$ is the value $x$ for which $x\mathcal{G} = Y$.
+
+If we had a given $Z_p^*$ and we could find an elliptic curve $E$ with the number of distinct elements $q$, such that $q$ is very close to $p$, this would be better than using a prime subgroup of $Z_p^*$.
+The reason is that a prime subgroup of $Z_p^*$ would require us to choose $q << p$ because of the attacks shown in Section \ref{sec:index_caclulus} and \ref{sec:sec:number_field_sieve} work against subgroups of $Z_p^*$.
+These smaller values are much faster to compute than bigger values.
+The question now is whether given $Z_p^*$ it is actually possible to find an elliptic curve with its number of elements close to $p$.
+Hasse's theorem shows that it is possible to find an elliptic curve with the number of elements relatively close to $p$ (with "only" up to $2\sqrt{p}$ distance to $p$):
+
+$$
+    p+1 - 2 \sqrt{p} \leq \; |E_{a,b}| \leq p+1 + 2 \sqrt{p}\;
+$$
+
+In practice, the value for $p$ and the elliptic curve is given.
+Those are defined through standards published by e.g. the BSI.
+
+The Youtube channel \url{https://www.youtube.com/@thenativeweb} also explains elliptic curves very nicely in the videos \textit{Architecture's Daily} episodes 91 to 95.
+
+\section{Diffie-Hellman Key Exchange}\label{sec:diffie_hellman}
+
+The Diffie-Hellman key exchange claims a way to generate a common secret key for two communication partners over a public channel.
+
+\begin{figure}{h}
+    \center
+    \includegraphics[width=\linewidth]{gfx/diffie-helman.png}
+    \caption{Illustration of the Diffie-Hellman key exchange. Note that $g$ and $p$ can be generated by Alice, like shown here, or delivered by a third party (since both values are public).}
+    \label{fig:diffie_hellman}
+\end{figure}
+
+\section{ElGamal Encryption and ICIES}\label{sec:elgamal}
+
+The ElGamal encryption simply uses Diffie-Hellman and the common key $K$ that it generates as the key for symmetric encryption.
+Although this is very obvious, the ElGamal encryption was published 10 years after the Diffie-Hellman key exchange paper.
+
+ICIES (Elliptic Curve Integrated Encryption Scheme) is a modern standardized version of the ElGamal encryption concept.
+It uses Diffie-Hellman for key exchange to generate two keys $(k_E, k_M)$, one for symmetric encryption and one for key exchange.
+It then uses encrypt and MAC, which we have learned earlier.
+Additionally, it uses a key derivation function (KDF).
+The purpose of this function is simply to transform points on the elliptic curve into a binary representation that can be used as a key.
+This means that KDF works like a hashing function.
+For simplicity, in the following, we use the notation above $Z_p^*$ although ICIES in reality work with elliptic curves.
+The operations of ICIES are formally defined as follows (assume a given Group $(G,g,p)$):
+
+\textbf{KeyGen (locally at sender side):}
+\begin{align*}
+    sk & \leftarrow Z_p^*  \\
+    pk & \leftarrow g^{sk}
+\end{align*}
+
+\textbf{Enc($pk, m$)} (possible without knowledge about sk):
+\begin{align*}
+    y              & \leftarrow Z_p^*         \\
+    Y              & \leftarrow g^y           \\
+    (k_E, k_M)     & \leftarrow KDF(pk^y)     \\
+    c              & \leftarrow SymEnc(k_E,m) \\
+    \tau           & \leftarrow MAC(k_M,c)    \\
+    \text{return } & (Y,c,\tau)
+\end{align*}
+
+\textbf{Dec($sk,(Y,c,\tau$)):}
+\begin{align*}
+    (k_E,k_M)                           & \leftarrow KDF(Y^{sk})   \\
+    \textit{if } MAC(k_M, c) \;!\; \tau & \text{ return } \perp    \\
+    m                                   & \leftarrow SymDec(k_E,c)
+\end{align*}
+
+This is a so-called KEM-DEM hybrid encryption.
+This term describes using an asymmetric system for generating a key and a faster symmetric system for encrypting payload data.
+
+
+\section{Discrete Security Assumptions}
+
+This chapter will explain the discrete security assumptions DL, CDH and DDH.
+It can be proven that if DDH holds, CDH must hold and if CDH holds, DL must hold.
+But we do not know the reverse.
+All these assumptions are unbroken for more than 40 years know, however, not been proven either.
+
+\subsection{DL (Discrete Logarithm) assumption}
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+    \center
+    \includegraphics[width=\linewidth]{gfx/discrete_log_assumption.png}
+    \caption{Game-based definition of the DL assumption.}
+    \label{fig:DL_assumption}
+\end{wrapfigure}
+
+The discrete logarithm assumption is that given a group $(G,g,p)$ and a value $y \in G$, the discrete logarithm $DLog_g(y)$ is not efficiently computable.
+This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
+DL then states the following regarding the game for all $PPT$ attackers $A$:
+
+$$
+    Pr[Exp_{GroupGen,A}^{dlog}(1^\lambda) = 1] \leq neg(\lambda)
+$$
+
+
+\subsection{CDH (Computational Diffie-Hellman) assumption}
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+    \center
+    \includegraphics[width=\linewidth]{gfx/CDH_assumption.png}
+    \caption{Game-based definition of the CDH assumption.}
+    \label{fig:CDH_assumption}
+\end{wrapfigure}
+
+
+The computational Diffie-Hellman assumption states that given a group $(G,g,p)$ and two values $g^x$ and $g^y$, $g^{xy}$ cannot be computed efficiently (of course without knowing $x$ and $y$ but only knowing the powers).
+If this holds, DL must also hold (can be shown by reduction).
+This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
+CDH then states the following regarding the game for all $PPT$ attackers $A$:
+
+$$
+    Pr[Exp_{GroupGen,A}^{cdh}(1^\lambda) = 1] \leq neg(\lambda)
+$$
+
+
+\subsection{DDH (Decisional Diffie-Hellman) assumption}
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+    \center
+    \includegraphics[width=\linewidth]{gfx/DDH_assumption.png}
+    \caption{Game-based definition of the DDH assumption.}
+    \label{fig:DDH_assumption}
+\end{wrapfigure}
+
+The decisional Diffie-Hellman assumption states that given $(G,p,g)$, $g^x$ and $g^y$, the two values $g^{xy}$ and $g^z$ can not be distinguished efficiently.
+If this holds, CDH must also hold (can be shown by reduction).
+This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
+DDH then states the following regarding the game for all $PPT$ attackers $A$:
+
+$$
+    Pr[Exp_{GroupGen,}^{ddh}(1^\lambda) = 1] \leq \frac{1}{2} + neg(\lambda)
+$$
 
