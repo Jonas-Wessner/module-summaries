@@ -155,7 +155,7 @@ In this section, we show the known attacks against the discrete logarithm on gro
 
 Try all values $g^0, g^1, g^2, g^3 (...)$ until the value $g^i = y$ is found.
 
-This trivial attack is on average not successful in an acceptable time because the attacker needs to try $\frac{1}{2} \cdot 2^\lambda$ of the possible $2^\lambda$ values on average. Therefore the runtime complexity is $O(\lambda)$
+This trivial attack is on average not successful in an acceptable time because the adversary needs to try $\frac{1}{2} \cdot 2^\lambda$ of the possible $2^\lambda$ values on average. Therefore the runtime complexity is $O(\lambda)$
 
 \subsection{Giant-step-baby-step algorithm}\label{sec:giant_baby}
 
@@ -199,7 +199,7 @@ From the attacks \ref{sec:giant_baby} and \ref{pollards_roh}, we see that the or
 
 From the attacks \ref{sec:index_caclulus} and \ref{sec:number_field_sieve}, we see that the range of numbers that we allow through the selection of $p$ must be even significantly greater than $q$ because the algorithms can break the $DL$ with logarithmic runtime based on $p$. Today, we would say $q \geq 3072$ would be sufficient.
 
-This means if we work on subgroups with prime order $q$ of $Z_p^*$, we have to allow bit strings with the length of $p = 3072$ bits even though we only use $2^q = 2^256$ of the possible $2^3072$ values.
+This means if we work on subgroups with prime order $q$ of $Z_p^*$, we have to allow bit strings with the length of $p = 3072$ bits even though we only use $2^q = 2^{256}$ of the possible $2^{3072}$ values.
 So this is not ideal.
 
 For this reason, today the discrete logarithm based on elliptic curves is used instead of on $Z_p^*$, prohibiting the index calculus (\ref{sec:index_caclulus}) and the number field sieve (\ref{sec:number_field_sieve}) attacks.
@@ -263,45 +263,63 @@ The Diffie-Hellman key exchange claims a way to generate a common secret key for
     \label{fig:diffie_hellman}
 \end{figure}
 
-\section{ElGamal Encryption and ICIES}\label{sec:elgamal}
+\section{ElGamal Encryption}\label{sec:elgamal}
 
-The ElGamal encryption simply uses Diffie-Hellman and the common key $K$ that it generates as the key for symmetric encryption.
-Although this is very obvious, the ElGamal encryption was published 10 years after the Diffie-Hellman key exchange paper.
+\begin{align*}
+     & \underline{KGen(1^\lambda):}           &  & \underline{Enc(pk, (G,g,q), m):}   &  & \underline{Dec(sk, (Y,c)):} \\
+     & (G,g,q) \leftarrow GroupGen(1^\lambda) &  & y \leftarrow\$ G                   &  & return c \cdot Y^{-sk}      \\
+     & sk \leftarrow\$ G                      &  & \text{return } (g^y, pk^y \cdot m) &  &                             \\
+     & pk \leftarrow g^{sk} \text{ in } G     &  &                                    &  &                             \\
+     & \text{return } ((G,g,q), (sk, pk))     &  &                                    &  &
+\end{align*}
 
-ICIES (Elliptic Curve Integrated Encryption Scheme) is a modern standardized version of the ElGamal encryption concept.
-It uses Diffie-Hellman for key exchange to generate two keys $(k_E, k_M)$, one for symmetric encryption and one for key exchange.
+ElGamal is IND-CPA if the DDH assumption (see section \ref{fig:DDH_assumption}) holds.
+It is not IND-CCA because it has the following property:
+
+$$
+    Dec(sk, (Y, c \cdot r)) = Dec(sk, (Y, c)) \cdot r
+$$
+
+This holds because of $Dec(sk, (Y, c \cdot r)) = Y^{-sk} \cdot c \cdot r = g^{-sk \cdot y} \cdot g^{sk \cdot y} \cdot m \cdot r = m \cdot r = Dec(sk, (Y, c)) \cdot r$.
+This allows an adversary to modify the ciphertext with a known outcome.
+The adversary can then divide $r$ back out.
+This way, ciphertexts $c$ can be decrypted without querying $c$ at the $DEC$ oracle, allowing us to compare them with an earlier from $ENC$ obtained $c$, this way breaking IND-CCA.
+
+A further restriction of ElGamal is that all messages must be in the group $G$ and therefore have a certain length and structure.
+Both problems are solved by ICIES.
+
+\section{ICIES encryption}\label{sec:ICIES}
+
+% TODO: differentiate between elgamal and DH
+
+The ICIES (Elliptic Curve Integrated Encryption Scheme) encryption is a modern standardized version of the ElGamal encryption concept and uses Diffie-Hellman and the common key $K$ that it generates as the input for a PRF to create a key for symmetric encryption and authentication.
+
+ICIES uses Diffie-Hellman for key exchange to generate two keys $(k_E, k_M)$, one for symmetric encryption and one for key exchange.
 It then uses encrypt and MAC, which we have learned earlier.
 Additionally, it uses a key derivation function (KDF).
 The purpose of this function is simply to transform points on the elliptic curve into a binary representation that can be used as a key.
 This means that KDF works like a hashing function.
 For simplicity, in the following, we use the notation above $Z_p^*$ although ICIES in reality work with elliptic curves.
-The operations of ICIES are formally defined as follows (assume a given Group $(G,g,p)$):
+The operations of ICIES are formally defined as follows:
 
-\textbf{KeyGen (locally at sender side):}
 \begin{align*}
-    sk & \leftarrow Z_p^*  \\
-    pk & \leftarrow g^{sk}
+     & \underline{KeyGen(1^\lambda)}:         &  & \underline{Enc(pk, m)}                 &  & \underline{Dec(sk,(Y,c,\tau))}                              \\
+     & (G,g,q) \leftarrow GroupGen(1^\lambda) &  & y             \leftarrow Z_p^*         &  & (k_E,k_M)                            \leftarrow KDF(Y^{sk}) \\
+     & sk \leftarrow  G                       &  & Y             \leftarrow g^y           &  & \textit{if } MAC(k_M, c) \;!=\; \tau  \text{ return } \perp \\
+     & pk  \leftarrow g^{sk}                  &  & (k_E, k_M)    \leftarrow KDF(pk^y)     &  & \text{return } SymDec(k_E,c)                                \\
+     & \text{return } ((G,g,q), (pk,sk))      &  & c             \leftarrow SymEnc(k_E,m) &  &                                                             \\
+     &                                        &  & \tau          \leftarrow MAC(k_M,c)    &  &                                                             \\
+     &                                        &  & \text{return }(Y,c,\tau)               &  &                                                             \\
 \end{align*}
 
-\textbf{Enc($pk, m$)} (possible without knowledge about sk):
-\begin{align*}
-    y              & \leftarrow Z_p^*         \\
-    Y              & \leftarrow g^y           \\
-    (k_E, k_M)     & \leftarrow KDF(pk^y)     \\
-    c              & \leftarrow SymEnc(k_E,m) \\
-    \tau           & \leftarrow MAC(k_M,c)    \\
-    \text{return } & (Y,c,\tau)
-\end{align*}
-
-\textbf{Dec($sk,(Y,c,\tau$)):}
-\begin{align*}
-    (k_E,k_M)                           & \leftarrow KDF(Y^{sk})   \\
-    \textit{if } MAC(k_M, c) \;!\; \tau & \text{ return } \perp    \\
-    m                                   & \leftarrow SymDec(k_E,c)
-\end{align*}
+$KeyGen$ is executed on the receiver side.
+Then the public key must be published.
+Afterwards, $Enc$ can be executed by senders.
+The receiver can then decrypt the ciphertexts $(Y, c, \tau$) using $Dec$.
 
 This is a so-called KEM-DEM hybrid encryption.
-This term describes using an asymmetric system for generating a key and a faster symmetric system for encrypting payload data.
+\textit{KEM-DEM} refers to a process of not explicitly encrypting the key, but already generating an encrypted key, which can be more performant than using a full asynchronous encryption to encrypt the symmetric key.
+\textit{Hybrid} describes using an asymmetric system for generating a key and a faster symmetric system for encrypting payload data.
 
 
 \section{Discrete Security Assumptions}
@@ -322,7 +340,7 @@ All these assumptions are unbroken for more than 40 years know, however, not bee
 
 The discrete logarithm assumption is that given a group $(G,g,p)$ and a value $y \in G$, the discrete logarithm $DLog_g(y)$ is not efficiently computable.
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-DL then states the following regarding the game for all $PPT$ attackers $A$:
+DL then states the following regarding the game for all $PPT$ adversarys $A$:
 
 $$
     Pr[Exp_{GroupGen,A}^{dlog}(1^\lambda) = 1] \leq neg(\lambda)
@@ -342,7 +360,7 @@ $$
 The computational Diffie-Hellman assumption states that given a group $(G,g,p)$ and two values $g^x$ and $g^y$, $g^{xy}$ cannot be computed efficiently (of course without knowing $x$ and $y$ but only knowing the powers).
 If this holds, DL must also hold (can be shown by reduction).
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-CDH then states the following regarding the game for all $PPT$ attackers $A$:
+CDH then states the following regarding the game for all $PPT$ adversarys $A$:
 
 $$
     Pr[Exp_{GroupGen,A}^{cdh}(1^\lambda) = 1] \leq neg(\lambda)
@@ -361,7 +379,7 @@ $$
 The decisional Diffie-Hellman assumption states that given $(G,p,g)$, $g^x$ and $g^y$, the two values $g^{xy}$ and $g^z$ can not be distinguished efficiently.
 If this holds, CDH must also hold (can be shown by reduction).
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-DDH then states the following regarding the game for all $PPT$ attackers $A$:
+DDH then states the following regarding the game for all $PPT$ adversarys $A$:
 
 $$
     Pr[Exp_{GroupGen,}^{ddh}(1^\lambda) = 1] \leq \frac{1}{2} + neg(\lambda)
