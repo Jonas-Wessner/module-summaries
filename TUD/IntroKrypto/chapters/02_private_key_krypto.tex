@@ -172,11 +172,18 @@ To prove the IND security of the newly constructed cryptographic method $\mathca
 \end{figure}
 
 
-\section{Indistinguishability Under Chosen Plaintext Attack (IND-CPA)}
+\section{Indistinguishability Under Chosen Plaintext Attack (IND-CPA)}\label{sec:ind-cpa-sym}
 
 CPA is an attack model in which the attacker can retrieve ciphertexts for arbitrarily chosen plain texts as many times as he wants. But because the attacker must be efficient, he can just retrieve a polynomial amount of ciphertexts. The game-based definition of IND-CPA security is identical to the definition of IND security but allows requesting $c_b$ multiple times for different message pairs $(m_0, m_1)$. But the encryption oracle will have to choose $b$ once in the beginning and then keep it the same for each request.
 
 Every IND-CPA-secure method is also IND-secure. But IND-secure methods are not automatically IND-CPA secure. For example, the OTP with the same key for each message is IND secure but not IND-CPA secure: An attacker could request the ciphertext for two message pairs $(m_0, m_1) \rightarrow c_1$ and $(m_0, m_2) \rightarrow c_2$. The attacker knows that if $b=0$, the oracle has encrypted $m_0$ two times and will therefore return $0$ if $c1 == c2$. If $b=2$, the oracle must have encrypted two different messages, which must because of correctness be mapped to different ciphertexts. Therefore, the attacker returns $1$ if $c_1 \neq c_2$.
+
+Generally speaking, deterministic encryptions\footnote{Such that return the same ciphertext if the same plaintext is queried} can never be IND-CPA.
+The reason for this is that the adversary could e.g. query $(m_0, m_0)$ at the $ENC$ oracle at first to receive $c_0$ and then could query $(m_0,m_1)$ at the $ENC$ oracle to receive $c_b$.
+Then the adversary can simply compare $c_b$ with $c_0$ to see whether $ENC$ has encrypted $m_0$ or $m_1$ to get to $c_b$.
+Therefore, only non-deterministic encryptions, i.e. such that produce different ciphertexts for the same plaintext, can be used.
+It follows that the $Enc$ operation must use some random component.
+To make it possible to compute $Dec$, the ciphertext (which might be a pair consisting of multiple bitstrings) must contain information about the random component used in $Enc$, for instance the $IV$ used for block ciphers (see section \ref{sec:block_cipher_modesOfOp}).
 
 An approach for making an encryption method using a secure PRG IND-CPA secure could be the following:\\
 For each message to encrypt, call the PRG first to generate a key that is twice as long as the fixed-size message length. Then use the first half of the PRG output for encryption and save the second part. The first seed for the PRG will be taken from a $KGen$ algorithm. The following keys will be the second half of the PRG in the previous iteration. Because the PRG output is pseudo-randomized, it is also a secure seed.\\
@@ -192,7 +199,7 @@ Another way to explain this is that a PRF is a function $F(k,x) \rightarrow y$, 
 
 \begin{itemize}
     \item $y_0$ and $y_1$, generated as $F(k,x_0) \rightarrow y_0$ and $F(k,x_0) \rightarrow y_0$, are different, if $x_0 \neq x_1$ and are equal if $x_0 = x_1$.
-    \item A CPA attacker cannot distinguish the output of a PRF from a truly random function, which would do the same thing but in a truly randomized fashion.
+    \item A CPA adversary cannot distinguish the output of a PRF from a truly random function, which would do the same thing but in a truly randomized fashion.
 \end{itemize}
 
 A PRF with equal input and output length is called length-preserving.
@@ -208,11 +215,11 @@ A pseudo-random permutation is, similar to a pseudo-random function, a family of
 A \textit{secure} (weak \textit{PRP}) is defined just like the definition for the secure PRF (as it is also a PRF).
 
 In contrast to PRFs and PRGs, PRPs also have a \textit{strong} security definition.
-A PRP is strong if is secure under chosen plain text attacks if the attacker can access the PRP and its inverted operation PRP$^{-1}$.
+A PRP is strong if is secure under chosen plain text attacks if the adversary can access the PRP and its inverted operation PRP$^{-1}$.
 The game-based CPA-IND definition states that, for a chosen bitstring, a distinguisher $D$ cannot distinguish the PRPs output of $f(x)$ or $f^{-1}(x)$ from the output of a real random permutation or its inverse operation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Data Encryption Standard (DES)}
+\section{Data Encryption Standard (DES)}\label{sec:DES}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 DES is a block cipher, which was used until about the year 2000. Because of its short keys, it was later replaced with DES3 and eventually by AES.
@@ -241,24 +248,24 @@ Regardless of the function $F$, the Feistel function can be reversed by applying
 
 The Feistel function provides the reversibility of the function, however, it does not provide the security itself. The security is provided by the internally utilized function $F$. In DES this function is using so-called S- and P-boxes, whose details go beyond the scope of this course. What is important, however, is that $F$ implements Shannon's Concept of \textit{confusion and diffusion} and that it takes a part of the key $k_i$ and a bitstring as an input. The function $F$ is, in fact, a non-reversible function.
 
-56 bits ($2^{56}$ possibilities) were soon not sufficient for security against brute-force attackers on modern hardware. What could have been done to increase its security would be creating a new encryption algorithm, which works like DES but uses a longer key. But to reduce the effort required to increase DES's security, another approach was used \textendash{} applying DES multiple times with different keys.
+56 bits ($2^{56}$ possibilities) were soon not sufficient for security against brute-force adversary on modern hardware. What could have been done to increase its security would be creating a new encryption algorithm, which works like DES but uses a longer key. But to reduce the effort required to increase DES's security, another approach was used \textendash{} applying DES multiple times with different keys.
 
-The first approach would be to compute DES two times with two different keys to achieve the security of $2^{112}$, because brute force a ciphertext, the attacker would have to compute all possible combinations of keys of the first DES and keys of the second DES $2^{56} \cdot 2^{56}$. But if an attacker would know the plain text $m$ and the ciphertext $c$ of a message, he could use a \textit{meet-in-the-middle} attack to drastically reduce the computational effort for brute forcing. In the following, the computation of double DES is shown:
+The first approach would be to compute DES two times with two different keys to achieve the security of $2^{112}$, because brute force a ciphertext, the adversary would have to compute all possible combinations of keys of the first DES and keys of the second DES $2^{56} \cdot 2^{56}$. But if an adversary would know the plain text $m$ and the ciphertext $c$ of a message, he could use a \textit{meet-in-the-middle} attack to drastically reduce the computational effort for brute forcing. In the following, the computation of double DES is shown:
 
 $$
     m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES_{2}(key_2, c') \rightarrow c
 $$
 
-An attacker could then first compute all possible intermediate ciphertexts $c'$ for all possible values of $k_1$ from $m$ and save the results in a hashmap. Then he could compute all possible intermediate ciphertexts $c'$ with all possible values of $k_2$ from $c$ using $DES_2^{-1}$. The computation required is equal to $2^{56} + 2^{56} = 2 \cdot 2^{56} = 2^{57}$ instead of $2^{112}$. To obtain the correct combination of $k_1$ and $k_2$, the attacker would then search for collisions i.e. for pairs $(k_1, k_2)$ that produced the same intermediate ciphertext $c'$.
+An adversary could then first compute all possible intermediate ciphertexts $c'$ for all possible values of $k_1$ from $m$ and save the results in a hashmap. Then he could compute all possible intermediate ciphertexts $c'$ with all possible values of $k_2$ from $c$ using $DES_2^{-1}$. The computation required is equal to $2^{56} + 2^{56} = 2 \cdot 2^{56} = 2^{57}$ instead of $2^{112}$. To obtain the correct combination of $k_1$ and $k_2$, the adversary would then search for collisions i.e. for pairs $(k_1, k_2)$ that produced the same intermediate ciphertext $c'$.
 
-For this reason, double DES is not useful. Instead, Triple DES is used, which has the security of $2^{112}$, because the attacker can use a meet-in-the-middle attack but has to calculate two DES on one of the sides. Triple DES uses the inverse operation (reverse order key parts of $k_2$) of $DES_2$ for the second DES. The reason is that there was uncertainty about whether DES could be a \textit{group}, such that there might be one $DES_{x}$ operation, which would be equal to the combination of $DES$ one to three. Later, however, it was discovered, that DES is not a group and inverting the middle DES was, therefore, not required:
+For this reason, double DES is not useful. Instead, Triple DES is used, which has the security of $2^{112}$, because the adversary can use a meet-in-the-middle attack but has to calculate two DES on one of the sides. Triple DES uses the inverse operation (reverse order key parts of $k_2$) of $DES_2$ for the second DES. The reason is that there was uncertainty about whether DES could be a \textit{group}, such that there might be one $DES_{x}$ operation, which would be equal to the combination of $DES$ one to three. Later, however, it was discovered, that DES is not a group and inverting the middle DES was, therefore, not required:
 
 $$
     m \rightarrow DES_{1}(key_1, m) \rightarrow c' \rightarrow DES^{-1}_{2}(key_2, c') \rightarrow c'' \rightarrow DES_{3}(key_3, c'') \rightarrow c
 $$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Advanced Encryption Standard (AES) (Exercise 6)}
+\section{Advanced Encryption Standard (AES) (Exercise 6)}\label{sec:AES}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The security of DES (56-bit keys) and DES3 (112-bit security) is not sufficient. For this reason, the NIST started a public challenge for creating a cryptographic process replacing DES in 1979. The winner of this contest was decided to be Rijndael in 2000, which is the basis for the nowadays used advanced encryption standard (AES). AES is Rijndael, which can generally work with different input and output sizes (block sizes), with a block size of 128-bit. The key length for AES can be chosen to be 128, 192 or 256-bit.
@@ -279,7 +286,7 @@ In the last round, AddRoundKey is executed instead of MixColumns. SubBytes is th
 AES is an IND-CPA secure PRP (and therefore also an IND-CPA secure PRF).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Block Cipher Modes of Operation (Exercise 6)}
+\section{Block Cipher Modes of Operation (Exercise 6)}\label{sec:block_cipher_modesOfOp}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The main characteristic of block ciphers is that they can only encrypt bit strings of fixed size.
@@ -433,11 +440,11 @@ The counter mode uses a combination of a key (here called initialization vector 
 \section{Message Authentication Codes and EUF-CMA}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Encryption methods only ensure \emph{confidentiality} and are not enough to ensure secure communication. What we want to do is to complement confidentiality with \emph{integrity} and \emph{authenticity}. These properties can be achieved by using \acp{MAC}. \acp{MAC} are checksums that include a secret key in their calculation. That way, if the \ac{MAC} is secure, the receiver of a message can be sure that the message has not been modified if the provided checksum is valid since no attacker can create a matching checksum for a modified message without knowing the secret key.
+Encryption methods only ensure \emph{confidentiality} and are not enough to ensure secure communication. What we want to do is to complement confidentiality with \emph{integrity} and \emph{authenticity}. These properties can be achieved by using \acp{MAC}. \acp{MAC} are checksums that include a secret key in their calculation. That way, if the \ac{MAC} is secure, the receiver of a message can be sure that the message has not been modified if the provided checksum is valid since no adversary can create a matching checksum for a modified message without knowing the secret key.
 
-The security of a \ac{MAC} is defined through the game-based definition of EUF-CMA, which stands for existential unforgeability under chosen message attacks. The attacker $A$ can query as many \acp{MAC} from the \ac{MAC} oracle as it wants. Eventually, $A$ must emit a pair $(m,\tau)$ of a message and a corresponding \ac{MAC}. The attacker $A$ is successful if $\tau$ matches the message $m$ and if the message $m$ has not been queried before.
+The security of a \ac{MAC} is defined through the game-based definition of EUF-CMA, which stands for existential unforgeability under chosen message attacks. The adversary $A$ can query as many \acp{MAC} from the \ac{MAC} oracle as it wants. Eventually, $A$ must emit a pair $(m,\tau)$ of a message and a corresponding \ac{MAC}. The adversary $A$ is successful if $\tau$ matches the message $m$ and if the message $m$ has not been queried before.
 
-A slightly stronger variant of EUF-CMA is sEUF-CMA (\emph{strong} EUF-CMA). A \ac{MAC} is sEUF-CMA if the attacker $A$ also wins the game if it finds another \ac{MAC} that is valid for a queried message $m$. That means that the requirements for the attacker's output are less strict. It is not required that the message $m$ has not been queried before, but only that the pair $(m,\tau)$ has not been queried before. Since this gives the attacker additional opportunities to break the \ac{MAC}, the \ac{MAC} must be more secure.
+A slightly stronger variant of EUF-CMA is sEUF-CMA (\emph{strong} EUF-CMA). A \ac{MAC} is sEUF-CMA if the adversary $A$ also wins the game if it finds another \ac{MAC} that is valid for a queried message $m$. That means that the requirements for the adversary's output are less strict. It is not required that the message $m$ has not been queried before, but only that the pair $(m,\tau)$ has not been queried before. Since this gives the adversary additional opportunities to break the \ac{MAC}, the \ac{MAC} must be more secure.
 
 %-------------------------------------------------
 \section{PRF-MAC}
@@ -445,7 +452,7 @@ A slightly stronger variant of EUF-CMA is sEUF-CMA (\emph{strong} EUF-CMA). A \a
 
 Every pseudo-random function is also a MAC for messages \emph{with the size of its input length}.
 To realize that, the MAC for a message $m$ is calculated by using the PRFs function value at position $m$ using the key $k$ as $MAC := PRF(k,m)$.
-To break this MAC an attacker would have to guess the value of a strong PRF without knowing the key, which is not possible.
+To break this MAC an adversary would have to guess the value of a strong PRF without knowing the key, which is not possible.
 Hence, the security of PRF-MACs can be proved using a reduction to the IND-CPA security of the used PRF.
 
 %-------------------------------------------------
@@ -458,13 +465,13 @@ Then the last ciphertext block is emitted.
 We had seen earlier that the security of block ciphers requires a \emph{random} initialization vector $IV$.
 This is different when building MACs based on block ciphers.
 Since the first ciphertext block is not transmitted, the receiver would not have a chance to recalculate the MAC as the information about the $IV$ is not transmitted.
-One could decide to transmit the $IV$ as well. This, however, would allow the attacker to modify the message and the $IV$, which may allow him to find a matching MAC for the modified message when using the modified $IV$.
+One could decide to transmit the $IV$ as well. This, however, would allow the adversary to modify the message and the $IV$, which may allow him to find a matching MAC for the modified message when using the modified $IV$.
 Hence, CBC-MACs using random $IV$s and transmitting them are not secure.
 Instead, CBC-MACs should use a \emph{constant} $IV$ (usually just $0^\lambda$, which is equivalent to no $IV$).
 
 CBC-MAC (see section \ref{sec:CBC} for details on CBC) is not EUF-CMA if messages with different lengths are allowed because it is vulnerable to length-extension attacks.
-In this kind of attack, the attacker chooses a message $m_1$ with the same length as the output of the MAC.
-Then the attacker receives $\tau_1$ from the $MAC$ oracle.
+In this kind of attack, the adversary chooses a message $m_1$ with the same length as the output of the MAC.
+Then the adversary receives $\tau_1$ from the $MAC$ oracle.
 Then the attacker sends a second request with $m_2 = \tau_1 \oplus m_1$ to the oracle and receives $\tau_2$.
 Now the attacker emits the pair $(m_3 = m_1||m_1,\; \tau_2)$.
 $\tau_2$ is a valid MAC for $m_3$, because the CBC-MAC computes
