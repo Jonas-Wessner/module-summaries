@@ -318,9 +318,12 @@ Afterwards, $Enc$ can be executed by senders.
 The receiver can then decrypt the ciphertexts $(Y, c, \tau$) using $Dec$.
 
 This is a so-called KEM-DEM hybrid encryption.
-\textit{KEM-DEM} refers to a process of not explicitly encrypting the key, but already generating an encrypted key, which can be more performant than using a full asynchronous encryption to encrypt the symmetric key.
-\textit{Hybrid} describes using an asymmetric system for generating a key and a faster symmetric system for encrypting payload data.
+\textit{KEM (Key Encapsulation)} refers to a process of not explicitly encrypting the key as one arbitrary message (in contrast to asynchronous encryption), but instead, only encrypting a key. Because optimizations can be applied, this can be faster than asynchronous encryption.
+\textit{DEM (Data Encapsulation)} refers to using a symmetric key for encrypting data.
+\textit{KEM-DEM Hybrid} describes using an asymmetric KEM system for generating a key and a faster symmetric DEM system for encrypting payload data.
 
+KEM-DEM hybrid encryption combines the simple key management of asynchronous encryption with the high performance of synchronous encryption.
+On the other hand, we need two systems instead of one, an asynchronous one and a synchronous one.
 
 \section{Discrete Security Assumptions}
 
