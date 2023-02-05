@@ -363,7 +363,7 @@ It can be proven that if DDH holds, CDH must hold and if CDH holds, DL must hold
 But we do not know the reverse.
 All these assumptions are unbroken for more than 40 years know, however, not been proven either.
 
-\subsection{DL (Discrete Logarithm) assumption}
+\subsection{DL (Discrete Logarithm) Assumption}
 
 \begin{wrapfigure}{r}{0.4\textwidth}
     \center
@@ -374,14 +374,14 @@ All these assumptions are unbroken for more than 40 years know, however, not bee
 
 The discrete logarithm assumption is that given a group $(G,g,p)$ and a value $y \in G$, the discrete logarithm $DLog_g(y)$ is not efficiently computable.
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-DL then states the following regarding the game for all $PPT$ adversarys $A$:
+DL then states the following regarding the game for all $PPT$ adversaries $A$:
 
 $$
     Pr[Exp_{GroupGen,A}^{dlog}(1^\lambda) = 1] \leq neg(\lambda)
 $$
 
 
-\subsection{CDH (Computational Diffie-Hellman) assumption}
+\subsection{CDH (Computational Diffie-Hellman) Assumption}
 
 \begin{wrapfigure}{r}{0.4\textwidth}
     \center
@@ -394,14 +394,14 @@ $$
 The computational Diffie-Hellman assumption states that given a group $(G,g,p)$ and two values $g^x$ and $g^y$, $g^{xy}$ cannot be computed efficiently (of course without knowing $x$ and $y$ but only knowing the powers).
 If this holds, DL must also hold (can be shown by reduction).
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-CDH then states the following regarding the game for all $PPT$ adversarys $A$:
+CDH then states the following regarding the game for all $PPT$ adversaries $A$:
 
 $$
     Pr[Exp_{GroupGen,A}^{cdh}(1^\lambda) = 1] \leq neg(\lambda)
 $$
 
 
-\subsection{DDH (Decisional Diffie-Hellman) assumption}
+\subsection{DDH (Decisional Diffie-Hellman) Assumption}
 
 \begin{wrapfigure}{r}{0.4\textwidth}
     \center
@@ -413,9 +413,34 @@ $$
 The decisional Diffie-Hellman assumption states that given $(G,p,g)$, $g^x$ and $g^y$, the two values $g^{xy}$ and $g^z$ can not be distinguished efficiently.
 If this holds, CDH must also hold (can be shown by reduction).
 This can be defined through the game shown in Figure \ref{fig:DDH_assumption}.
-DDH then states the following regarding the game for all $PPT$ adversarys $A$:
+DDH then states the following regarding the game for all $PPT$ adversaries $A$:
 
 $$
     Pr[Exp_{GroupGen,}^{ddh}(1^\lambda) = 1] \leq \frac{1}{2} + neg(\lambda)
 $$
 
+
+\section{Textbook-RSA}\label{sec:textbook_rsa}
+
+
+\begin{align*}
+     & \underline{KeyGen(1^\lambda)}:         &  & \underline{Enc((N,e), m)} &  & \underline{Dec((N,d), c)} \\
+     & (N, e, d) \leftarrow RSAGen(1^\lambda) &  & \text{return }(m^e mod N) &  & \text{return } c^d mod N  \\
+     & \text{return } (N, e, d)               &  &                           &  &                           \\
+\end{align*}
+
+The correctness is assured because $RSAGen$ chooses two prime numbers $p$ and $q$ (of similar lengths) to compute $N$.
+Because we know that $\Phi(p \cdot q) = (p-1)(q-1)$, the algorithm can compute an exponent $e$ that has a multiplicative inverse in $mod\; \Phi(N)$ (fulfilled if $gcd(e, \Phi(N)) = 1)$.
+Then the $RSAGen$ algorithm can also compute that inverse $d$ of $e$ for which $d \cdot e = 1 \;mod\; \Phi(N)$ since it knows $\Phi(N)$.
+Because we know that $\forall x \in Z_m^* :\; x^r = x^{r \;mod\; \Phi(m)} \;mod\; m $ the correctness of Textbook RSA follows as:
+
+\begin{align*}
+    m & = Dec((N,d), Enc((N,e), m))         \\
+      & = Dec((N,d), m^d \;mod\; N)         \\
+      & = m^{d \cdot e} \;mod\; N                 \\
+      & = m^{d \cdot e \;mod\; \Phi(N) \;mod\; N} \\
+      & = m^1 \;mod\; N                     \\
+      & = m
+\end{align*}
+
+% TODO: continue here (probably next: security assumption)
