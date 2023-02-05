@@ -481,6 +481,12 @@ If this does not hold, an adversary to RSA could factorize $N$ to $p$ and $q$ an
 So we know if the RSA assumption holds, then prime factorization must also be difficult.
 However, if prime factorization is difficult, we do not know if the RSA assumption holds because there might be another way of breaking RSA that we do not know yet.
 
+One of the best attacks known against RSA is by factorization e.g. the number field-sieve with the runtime complexity:
+
+$$
+O(2^{log(N)^{1/3} \cdot log(log(N))^{2/3}})
+$$
+
 
 \section{Optimal Asymmetric Encryption Padding (OAEP)}\label{sec:oaep}
 
