@@ -435,12 +435,77 @@ Then the $RSAGen$ algorithm can also compute that inverse $d$ of $e$ for which $
 Because we know that $\forall x \in Z_m^* :\; x^r = x^{r \;mod\; \Phi(m)} \;mod\; m $ the correctness of Textbook RSA follows as:
 
 \begin{align*}
-    m & = Dec((N,d), Enc((N,e), m))         \\
-      & = Dec((N,d), m^d \;mod\; N)         \\
+    m & = Dec((N,d), Enc((N,e), m))               \\
+      & = Dec((N,d), m^d \;mod\; N)               \\
       & = m^{d \cdot e} \;mod\; N                 \\
       & = m^{d \cdot e \;mod\; \Phi(N) \;mod\; N} \\
-      & = m^1 \;mod\; N                     \\
+      & = m^1 \;mod\; N                           \\
       & = m
 \end{align*}
 
-% TODO: continue here (probably next: security assumption)
+Textbook-RSA is not IND-CPA and therefore also not IND-CCA because it is a deterministic encryption system (see Section \ref{sec:ind-cpa-sym}).
+
+Furthermore, another property of Textbook-RSA interferes with IND-CCA.
+Textbook-RSA has a \emph{homomorphism} property (just like ElGamal).
+This means that $Enc(m_0) \cdot Enc(m_1) = Enc(m_0 \cdot m_1)$ because $Enc(m_0) \cdot Enc(m_1) = m_0^e \;mod\;N\; \cdot m_1^e \;mod\;N\; = (m_0 * m_1)^e \;mod\;N = Enc(m_0 \cdot m_1)$.
+Using this, an adversary against IND-CCA can query $ENC(m_0, m_1) \rightarrow c_b$ and then query $DEC(c_b \cdot c_b) \rightarrow m^*$ (because $c_b \cdot c_b$ has never been returned by $ENC$ before).
+Then he could compare $m^*$ with $m_0 \cdot m_0$ or with $m_1 \cdot m_1$ to find out $b$.
+
+RSA is also called a \emph{trapdoor function}, because it is not invertible if $d$ is unknown, but if $d$ is known (or something that gets us to $d$ e.g. $p$ and $q$), it is invertible (trapdoor opened by $d$).
+
+\section{RSA assumption}
+
+RSA is based on the RSA assumption defined through the following security game $Exp^{RSA}{A}$:
+
+\begin{align*}
+    \underline{Exp^{RSA}(1^\lambda):} &                                  \\
+    (N,e,d)                           & \leftarrow\$ \;RSAGen(1^\lambda) \\
+    x                                 & \leftarrow\$ \;Z_N^*             \\
+    y                                 & \leftarrow x^e \; mod \; N       \\
+    x*                                & \leftarrow A(1^\lambda, N, e, y) \\
+    return                            & \; [(x^*)^e = y \; mod \; N]
+\end{align*}
+
+For all PPT algorithms $A$ there exists a negligible function $neg(\lambda)$ such that:
+
+$$
+    Pr[Exp^{RSA}(1^\lambda) = 1] \leq neg(\lambda)
+$$
+
+In other words, there is no efficient algorithm that can compute the message $x$ or an equivalent value without knowledge of $d$.
+
+This assumption is tightly coupled with the assumption that it is difficult to factorize prime number products:
+Given a product of prime numbers $N = p \cdot q$, we assume there is no efficient algorithm that computes $p$ and $q$.
+If this does not hold, an adversary to RSA could factorize $N$ to $p$ and $q$ and then compute $Phi(N)$ as $(p-1) \cdot (q-1)$ and from that $d$ in the same way that the $RSAGen$ algorithm does.
+
+So we know if the RSA assumption holds, then prime factorization must also be difficult.
+However, if prime factorization is difficult, we do not know if the RSA assumption holds because there might be another way of breaking RSA that we do not know yet.
+
+
+\section{Optimal Asymmetric Encryption Padding (OAEP)}\label{sec:oaep}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \center
+    \includegraphics[width=\linewidth]{gfx/OAEP.png}
+    \caption{OAEP permutation before applying RSA function}
+    \label{fig:OAEP}
+\end{wrapfigure}
+
+To build an IND-CCA secure encryption system utilizing the RSA function that does not have the drawbacks of textbook RSA (determinism, homomorphism), the OAEP system has been developed.
+It adds two different types of padding to the message and uses two hash functions $G$ and $H$ to combine the messages.
+Afterwards, the resulting new bit string $X||Y$ is used as input for the RSA function.
+
+The first type of padding is a random part $r$ consisting of $k_0$ bits.
+This adds the probabilistic component to the encryption, therefore making it IND-CPA:
+Since $G$ produces random bits based on $r$, the left side becomes a pseudo-random string.
+Afterwards, we use this as input for $H$ and add the resulting pseudo-random string to the right part.
+Therefore, both, $X$ and $Y$ will look like random bit strings.
+Using then RSA on top of that makes it IND-CPA (full proof not discussed here.)
+
+The second type of padding is a field of $k_0$ zero-bits.
+These are used for checking the integrity of decrypted ciphertexts and thereby ensuring IND-CCA:
+When decrypting a ciphertext, the $Dec$ function first computes the inverse of the RSA function using $d$, thereby reconstructing $X||Y$.
+Then the Feistel network is traversed from the bottom up (hash functions do not need to be inverted, they will cancel out by XOR).
+If an adversary tries to modify a ciphertext $c$ before passing it to $DEC$, the zero-bits will be modified (contain ones) with high probability due to the diffusion done by the Feistel.
+In this case, $Dec$ will return an error, thereby preventing adversaries from modifying and then decrypting ciphertexts.
+This way, the IND-CCA attack against textbook RSA, which was based on the homomorphism of the RSA function, is no longer possible.
