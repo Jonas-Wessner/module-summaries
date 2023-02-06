@@ -484,7 +484,7 @@ However, if prime factorization is difficult, we do not know if the RSA assumpti
 One of the best attacks known against RSA is by factorization e.g. the number field-sieve with the runtime complexity:
 
 $$
-O(2^{log(N)^{1/3} \cdot log(log(N))^{2/3}})
+    O(2^{log(N)^{1/3} \cdot log(log(N))^{2/3}})
 $$
 
 
@@ -515,3 +515,6 @@ Then the Feistel network is traversed from the bottom up (hash functions do not 
 If an adversary tries to modify a ciphertext $c$ before passing it to $DEC$, the zero-bits will be modified (contain ones) with high probability due to the diffusion done by the Feistel.
 In this case, $Dec$ will return an error, thereby preventing adversaries from modifying and then decrypting ciphertexts.
 This way, the IND-CCA attack against textbook RSA, which was based on the homomorphism of the RSA function, is no longer possible.
+
+
+% TODO: continue at VL (n-4) at introduction to digital signatures
